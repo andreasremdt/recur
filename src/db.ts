@@ -9,3 +9,17 @@ export function getAllVocabulary() {
     .query<Vocabulary, SQLQueryBindings[]>("SELECT * FROM vocabulary")
     .all();
 }
+
+export function createVocabulary(front: string, back: string): Vocabulary {
+  const id = crypto.randomUUID();
+  const today = new Date().toISOString().slice(0, 10);
+
+  db.run(
+    "INSERT INTO vocabulary (id, front, back, box, next_review) VALUES (?, ?, ?, ?, ?)",
+    [id, front, back, 1, today]
+  );
+
+  return db
+    .query<Vocabulary, string[]>("SELECT * FROM vocabulary WHERE id = ?")
+    .get(id)!;
+}

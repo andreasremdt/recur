@@ -1,4 +1,4 @@
-import { getAllVocabulary } from "./db";
+import { createVocabulary, getAllVocabulary } from "./db";
 
 const PUBLIC_DIR = new URL("../public", import.meta.url).pathname;
 
@@ -6,7 +6,23 @@ const server = Bun.serve({
   port: 3000,
   routes: {
     "/": Bun.file(`${PUBLIC_DIR}/index.html`),
-    "/api/vocabulary": Response.json(getAllVocabulary()),
+    "/api/vocabulary": {
+      GET: () => Response.json(getAllVocabulary()),
+      POST: async (request) => {
+        const body = (await request.json()) as { front?: string; back?: string };
+        const { front, back } = body;
+
+        if (!front || !back) {
+          return Response.json(
+            { error: "front and back are required" },
+            { status: 400 }
+          );
+        }
+
+        const vocabulary = createVocabulary(front, back);
+        return Response.json(vocabulary, { status: 201 });
+      },
+    },
     "/*": async (request) => {
       const url = new URL(request.url);
       const file = Bun.file(`${PUBLIC_DIR}${url.pathname}`);

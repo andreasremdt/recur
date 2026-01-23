@@ -9,24 +9,19 @@
 <body>
   <div class="container">
     <h1>Memrise</h1>
-    <p>A simple Bun server with SQLite</p>
-    <button onclick="fetchHello()">Call API</button>
-    <div id="response"></div>
+    <table id="vocabulary-table">
+      <thead>
+        <tr>
+          <th>Front</th>
+          <th>Back</th>
+          <th>Box</th>
+          <th>Next Review</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 
-  <script>
-    async function fetchHello() {
-      const responseDiv = document.getElementById("response");
-      try {
-        const res = await fetch("/api/vocabulary");
-        const data = await res.json();
-        responseDiv.textContent = JSON.stringify(data, null, 2);
-        responseDiv.style.display = "block";
-      } catch (error) {
-        responseDiv.textContent = "Error: " + error.message;
-        responseDiv.style.display = "block";
-      }
-    }
-  </script>
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>

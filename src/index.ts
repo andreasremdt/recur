@@ -13,7 +13,7 @@ db.run(`
 const server = Bun.serve({
   port: 3000,
   routes: {
-    "/": Bun.file("index.html"),
+    "/": Bun.file(new URL("../public/index.html", import.meta.url)),
     "/api/hello": Response.json({ message: "Hello World" }),
     "/*": Response.json({ message: "Not Found" }, { status: 404 }),
   },

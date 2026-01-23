@@ -1,11 +1,22 @@
 import { getAllVocabulary } from "./db";
 
+const PUBLIC_DIR = new URL("../public", import.meta.url).pathname;
+
 const server = Bun.serve({
   port: 3000,
   routes: {
-    "/": Bun.file(new URL("../public/index.html", import.meta.url)),
+    "/": Bun.file(`${PUBLIC_DIR}/index.html`),
     "/api/vocabulary": Response.json(getAllVocabulary()),
-    "/*": Response.json({ message: "Not Found" }, { status: 404 }),
+    "/*": async (request) => {
+      const url = new URL(request.url);
+      const file = Bun.file(`${PUBLIC_DIR}${url.pathname}`);
+
+      if (await file.exists()) {
+        return new Response(file);
+      }
+
+      return Response.json({ message: "Not Found" }, { status: 404 });
+    },
   },
 });
 

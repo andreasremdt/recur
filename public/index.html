@@ -10,11 +10,7 @@
   <div class="container">
     <h1>Memrise</h1>
 
-    <form id="add-vocabulary-form">
-      <input type="text" name="front" placeholder="Front (e.g. hello)" required>
-      <input type="text" name="back" placeholder="Back (e.g. hola)" required>
-      <button type="submit">Add</button>
-    </form>
+    <button type="button" id="add-vocabulary-btn">Add Vocabulary</button>
 
     <table id="vocabulary-table">
       <thead>
@@ -23,11 +19,31 @@
           <th>Back</th>
           <th>Box</th>
           <th>Next Review</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
+
+  <dialog id="vocabulary-dialog">
+    <form id="vocabulary-form" method="dialog">
+      <h2 id="dialog-title">Add Vocabulary</h2>
+      <input type="hidden" name="id">
+      <label>
+        Front
+        <input type="text" name="front" placeholder="e.g. hello" required>
+      </label>
+      <label>
+        Back
+        <input type="text" name="back" placeholder="e.g. hola" required>
+      </label>
+      <div class="dialog-actions">
+        <button type="button" id="dialog-cancel-btn">Cancel</button>
+        <button type="submit" id="dialog-submit-btn">Save</button>
+      </div>
+    </form>
+  </dialog>
 
   <script type="module" src="/js/main.js"></script>
 </body>

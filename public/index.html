@@ -10,7 +10,10 @@
   <div class="container">
     <h1>Memrise</h1>
 
-    <button type="button" id="add-vocabulary-btn">Add Vocabulary</button>
+    <div class="actions">
+      <button type="button" id="add-vocabulary-btn">Add Vocabulary</button>
+      <button type="button" id="start-training-btn">Start Training</button>
+    </div>
 
     <table id="vocabulary-table">
       <thead>
@@ -43,6 +46,35 @@
         <button type="submit" id="dialog-submit-btn">Save</button>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="training-dialog">
+    <div id="training-content">
+      <h2>Training</h2>
+      <p id="training-progress"></p>
+      <div id="training-card">
+        <p id="training-front" class="card-front"></p>
+        <form id="training-form">
+          <input type="text" id="training-answer" placeholder="Type your answer..." autocomplete="off" required>
+          <button type="submit">Check</button>
+        </form>
+        <div id="training-result" hidden>
+          <p id="training-feedback"></p>
+          <p>Correct answer: <strong id="training-correct-answer"></strong></p>
+          <button type="button" id="training-next-btn">Next</button>
+        </div>
+      </div>
+    </div>
+    <div id="training-complete" hidden>
+      <h2>Training Complete!</h2>
+      <p id="training-summary"></p>
+      <button type="button" id="training-close-btn">Close</button>
+    </div>
+    <div id="training-empty" hidden>
+      <h2>No Words to Review</h2>
+      <p>There are no vocabulary words scheduled for review today.</p>
+      <button type="button" id="training-empty-close-btn">Close</button>
+    </div>
   </dialog>
 
   <script type="module" src="/js/main.js"></script>

@@ -1,11 +1,36 @@
 import fetcher from "./fetcher.js";
 
+// Vocabulary table elements
 const tbody = document.querySelector("#vocabulary-table tbody");
 const dialog = document.querySelector("#vocabulary-dialog");
 const form = document.querySelector("#vocabulary-form");
 const dialogTitle = document.querySelector("#dialog-title");
 const addBtn = document.querySelector("#add-vocabulary-btn");
 const cancelBtn = document.querySelector("#dialog-cancel-btn");
+
+// Training elements
+const trainingDialog = document.querySelector("#training-dialog");
+const trainingContent = document.querySelector("#training-content");
+const trainingComplete = document.querySelector("#training-complete");
+const trainingEmpty = document.querySelector("#training-empty");
+const trainingProgress = document.querySelector("#training-progress");
+const trainingFront = document.querySelector("#training-front");
+const trainingForm = document.querySelector("#training-form");
+const trainingAnswer = document.querySelector("#training-answer");
+const trainingResult = document.querySelector("#training-result");
+const trainingFeedback = document.querySelector("#training-feedback");
+const trainingCorrectAnswer = document.querySelector("#training-correct-answer");
+const trainingNextBtn = document.querySelector("#training-next-btn");
+const trainingSummary = document.querySelector("#training-summary");
+const startTrainingBtn = document.querySelector("#start-training-btn");
+const closeTrainingBtn = document.querySelector("#training-close-btn");
+const emptyCloseBtn = document.querySelector("#training-empty-close-btn");
+
+// Training state
+let trainingQueue = [];
+let currentIndex = 0;
+let correctCount = 0;
+let incorrectCount = 0;
 
 function createRow(word) {
   const row = document.createElement("tr");
@@ -166,6 +191,112 @@ tbody.addEventListener("click", (event) => {
     openDialog("edit", row);
   } else if (target.classList.contains("delete-btn")) {
     handleDelete(row);
+  }
+});
+
+// Training functions
+function showTrainingCard() {
+  const word = trainingQueue[currentIndex];
+  trainingProgress.textContent = `Card ${currentIndex + 1} of ${trainingQueue.length} (Box ${word.box})`;
+  trainingFront.textContent = word.front;
+  trainingAnswer.value = "";
+  trainingForm.hidden = false;
+  trainingResult.hidden = true;
+  trainingAnswer.focus();
+}
+
+function normalizeAnswer(str) {
+  return str.trim().toLowerCase();
+}
+
+async function checkAnswer(userAnswer) {
+  const word = trainingQueue[currentIndex];
+  const correct = normalizeAnswer(userAnswer) === normalizeAnswer(word.back);
+
+  if (correct) {
+    correctCount++;
+    trainingFeedback.textContent = "Correct!";
+    trainingFeedback.className = "feedback-correct";
+  } else {
+    incorrectCount++;
+    trainingFeedback.textContent = "Incorrect";
+    trainingFeedback.className = "feedback-incorrect";
+  }
+
+  trainingCorrectAnswer.textContent = word.back;
+  trainingForm.hidden = true;
+  trainingResult.hidden = false;
+
+  try {
+    const updated = await fetcher.post(`/api/training/${word.id}`, { correct });
+
+    // Update the table row if it exists
+    const row = tbody.querySelector(`tr[data-id="${word.id}"]`);
+    if (row) {
+      row.children[2].textContent = updated.box;
+      row.children[3].textContent = updated.next_review;
+    }
+  } catch (error) {
+    console.error("Failed to update vocabulary:", error);
+  }
+}
+
+function nextCard() {
+  currentIndex++;
+
+  if (currentIndex < trainingQueue.length) {
+    showTrainingCard();
+  } else {
+    trainingContent.hidden = true;
+    trainingComplete.hidden = false;
+    trainingSummary.textContent = `You got ${correctCount} out of ${trainingQueue.length} correct.`;
+  }
+}
+
+async function startTraining() {
+  try {
+    trainingQueue = await fetcher.get("/api/training");
+    currentIndex = 0;
+    correctCount = 0;
+    incorrectCount = 0;
+
+    // Reset dialog state
+    trainingContent.hidden = false;
+    trainingComplete.hidden = true;
+    trainingEmpty.hidden = true;
+
+    if (trainingQueue.length === 0) {
+      trainingContent.hidden = true;
+      trainingEmpty.hidden = false;
+    } else {
+      showTrainingCard();
+    }
+
+    trainingDialog.showModal();
+  } catch (error) {
+    console.error("Failed to start training:", error);
+  }
+}
+
+function closeTrainingDialog() {
+  trainingDialog.close();
+}
+
+// Training event listeners
+startTrainingBtn.addEventListener("click", startTraining);
+
+trainingForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  checkAnswer(trainingAnswer.value);
+});
+
+trainingNextBtn.addEventListener("click", nextCard);
+closeTrainingBtn.addEventListener("click", closeTrainingDialog);
+emptyCloseBtn.addEventListener("click", closeTrainingDialog);
+
+trainingDialog.addEventListener("click", (event) => {
+  if (event.target === trainingDialog) {
+    closeTrainingDialog();
   }
 });
 

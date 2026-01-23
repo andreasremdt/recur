@@ -12,6 +12,12 @@ const server = Bun.serve({
       PATCH: controller.vocabulary.update,
       DELETE: controller.vocabulary.delete,
     },
+    "/api/training": {
+      GET: controller.training.scheduled,
+    },
+    "/api/training/:id": {
+      POST: controller.training.review,
+    },
     "/*": controller.static,
   },
 });

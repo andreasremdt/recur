@@ -2,7 +2,9 @@ import {
   createVocabulary,
   deleteVocabulary,
   getAllVocabulary,
+  getScheduledVocabulary,
   updateVocabulary,
+  updateVocabularyBox,
 } from "./db";
 
 const PUBLIC_DIR = new URL("../public", import.meta.url).pathname;
@@ -54,6 +56,29 @@ const controller = {
       }
 
       return new Response(null, { status: 204 });
+    },
+  },
+
+  training: {
+    scheduled: () => Response.json(getScheduledVocabulary()),
+    review: async (request: Bun.BunRequest<"/api/training/:id">) => {
+      const id = request.params.id;
+      const body = (await request.json()) as { correct?: boolean };
+
+      if (typeof body.correct !== "boolean") {
+        return Response.json(
+          { error: "correct (boolean) is required" },
+          { status: 400 },
+        );
+      }
+
+      const vocabulary = updateVocabularyBox(id, body.correct);
+
+      if (!vocabulary) {
+        return Response.json({ error: "Not found" }, { status: 404 });
+      }
+
+      return Response.json(vocabulary);
     },
   },
 

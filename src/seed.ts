@@ -26,14 +26,34 @@ const insert = db.prepare(`
   VALUES (?, ?, ?, ?, ?)
 `);
 
-const today = new Date().toISOString().slice(0, 10);
+// Helper to get date relative to today
+function getDate(daysOffset: number): string {
+  const date = new Date();
+  date.setDate(date.getDate() + daysOffset);
+  return date.toISOString().slice(0, 10);
+}
 
 const vocabulary: [string, string, string, number, string][] = [
-  [crypto.randomUUID(), "hello", "hola", 1, today],
-  [crypto.randomUUID(), "goodbye", "adiós", 1, today],
-  [crypto.randomUUID(), "thank you", "gracias", 1, today],
-  [crypto.randomUUID(), "please", "por favor", 1, today],
-  [crypto.randomUUID(), "good morning", "buenos días", 1, today],
+  // Box 1 - Daily review (due today and yesterday)
+  [crypto.randomUUID(), "hello", "hola", 1, getDate(-1)],
+  [crypto.randomUUID(), "goodbye", "adiós", 1, getDate(0)],
+  [crypto.randomUUID(), "thank you", "gracias", 1, getDate(0)],
+
+  // Box 2 - Review every 2 days
+  [crypto.randomUUID(), "please", "por favor", 2, getDate(0)],
+  [crypto.randomUUID(), "good morning", "buenos días", 2, getDate(1)],
+
+  // Box 3 - Review every 4 days
+  [crypto.randomUUID(), "good evening", "buenas tardes", 3, getDate(0)],
+  [crypto.randomUUID(), "good night", "buenas noches", 3, getDate(3)],
+
+  // Box 4 - Review every 7 days
+  [crypto.randomUUID(), "how are you", "¿cómo estás?", 4, getDate(0)],
+  [crypto.randomUUID(), "I'm fine", "estoy bien", 4, getDate(5)],
+
+  // Box 5 - Review every 14 days (mastered)
+  [crypto.randomUUID(), "yes", "sí", 5, getDate(0)],
+  [crypto.randomUUID(), "no", "no", 5, getDate(10)],
 ];
 
 for (const word of vocabulary) {

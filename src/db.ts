@@ -63,3 +63,59 @@ export function deleteVocabulary(id: string): boolean {
 
   return true;
 }
+
+export function getScheduledVocabulary(): Vocabulary[] {
+  const today = new Date().toISOString().slice(0, 10);
+
+  return db
+    .query<Vocabulary, string[]>(
+      "SELECT * FROM vocabulary WHERE next_review <= ? ORDER BY box ASC, next_review ASC",
+    )
+    .all(today);
+}
+
+// SM-2 intervals: Box 1 = 1 day, Box 2 = 2 days, Box 3 = 4 days, Box 4 = 7 days, Box 5 = 14 days
+const BOX_INTERVALS: Record<number, number> = {
+  1: 1,
+  2: 2,
+  3: 4,
+  4: 7,
+  5: 14,
+};
+
+export function updateVocabularyBox(
+  id: string,
+  correct: boolean,
+): Vocabulary | null {
+  const existing = db
+    .query<Vocabulary, string[]>("SELECT * FROM vocabulary WHERE id = ?")
+    .get(id);
+
+  if (!existing) {
+    return null;
+  }
+
+  // Calculate new box level (min 1, max 5)
+  let newBox = existing.box;
+  if (correct) {
+    newBox = Math.min(5, existing.box + 1);
+  } else {
+    newBox = Math.max(1, existing.box - 1);
+  }
+
+  // Calculate next review date based on new box
+  const interval = BOX_INTERVALS[newBox] ?? 1;
+  const nextReview = new Date();
+  nextReview.setDate(nextReview.getDate() + interval);
+  const nextReviewStr = nextReview.toISOString().slice(0, 10);
+
+  db.run("UPDATE vocabulary SET box = ?, next_review = ? WHERE id = ?", [
+    newBox,
+    nextReviewStr,
+    id,
+  ]);
+
+  return db
+    .query<Vocabulary, string[]>("SELECT * FROM vocabulary WHERE id = ?")
+    .get(id)!;
+}

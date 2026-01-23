@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memrise</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Memrise</h1>
+    <p>A simple Bun server with SQLite</p>
+    <button onclick="fetchHello()">Call API</button>
+    <div id="response"></div>
+  </div>
+
+  <script>
+    async function fetchHello() {
+      const responseDiv = document.getElementById("response");
+      try {
+        const res = await fetch("/api/hello");
+        const data = await res.json();
+        responseDiv.textContent = JSON.stringify(data, null, 2);
+        responseDiv.style.display = "block";
+      } catch (error) {
+        responseDiv.textContent = "Error: " + error.message;
+        responseDiv.style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html>

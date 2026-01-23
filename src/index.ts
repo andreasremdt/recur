@@ -1,12 +1,10 @@
-import { Database } from "bun:sqlite";
-
-const db = new Database("dev.db");
+import { getAllVocabulary } from "./db";
 
 const server = Bun.serve({
   port: 3000,
   routes: {
     "/": Bun.file(new URL("../public/index.html", import.meta.url)),
-    "/api/hello": Response.json({ message: "Hello World" }),
+    "/api/vocabulary": Response.json(getAllVocabulary()),
     "/*": Response.json({ message: "Not Found" }, { status: 404 }),
   },
 });

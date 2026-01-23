@@ -17,7 +17,7 @@
     async function fetchHello() {
       const responseDiv = document.getElementById("response");
       try {
-        const res = await fetch("/api/hello");
+        const res = await fetch("/api/vocabulary");
         const data = await res.json();
         responseDiv.textContent = JSON.stringify(data, null, 2);
         responseDiv.style.display = "block";

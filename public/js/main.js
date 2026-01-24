@@ -148,12 +148,14 @@ function insertRowInBox(row, box) {
 async function handleCreate(front, back) {
   // Optimistically add to table
   const tempId = crypto.randomUUID();
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
   const optimisticWord = {
     id: tempId,
     front,
     back,
     box: 1,
-    next_review: new Date().toISOString().slice(0, 10),
+    next_review: tomorrow.toISOString().slice(0, 10),
   };
   const row = createRow(optimisticWord);
   row.classList.add("pending");

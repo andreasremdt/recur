@@ -6,19 +6,22 @@ db.run("PRAGMA journal_mode = WAL;");
 
 export function getAllVocabulary() {
   return db
-    .query<Vocabulary, SQLQueryBindings[]>(
-      "SELECT * FROM vocabulary ORDER BY box ASC, next_review ASC",
-    )
+    .query<
+      Vocabulary,
+      SQLQueryBindings[]
+    >("SELECT * FROM vocabulary ORDER BY box ASC, next_review ASC")
     .all();
 }
 
 export function createVocabulary(front: string, back: string): Vocabulary {
   const id = crypto.randomUUID();
-  const today = new Date().toISOString().slice(0, 10);
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const nextReview = tomorrow.toISOString().slice(0, 10);
 
   db.run(
     "INSERT INTO vocabulary (id, front, back, box, next_review) VALUES (?, ?, ?, ?, ?)",
-    [id, front, back, 1, today],
+    [id, front, back, 1, nextReview],
   );
 
   return db
@@ -70,9 +73,10 @@ export function getScheduledVocabulary(): Vocabulary[] {
   const today = new Date().toISOString().slice(0, 10);
 
   return db
-    .query<Vocabulary, string[]>(
-      "SELECT * FROM vocabulary WHERE next_review <= ? ORDER BY box ASC, next_review ASC",
-    )
+    .query<
+      Vocabulary,
+      string[]
+    >("SELECT * FROM vocabulary WHERE next_review <= ? ORDER BY box ASC, next_review ASC")
     .all(today);
 }
 

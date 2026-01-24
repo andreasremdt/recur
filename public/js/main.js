@@ -7,6 +7,7 @@ const form = document.querySelector("#vocabulary-form");
 const dialogTitle = document.querySelector("#dialog-title");
 const addBtn = document.querySelector("#add-vocabulary-btn");
 const cancelBtn = document.querySelector("#dialog-cancel-btn");
+const saveAddBtn = document.querySelector("#dialog-save-add-btn");
 
 // Training elements
 const trainingDialog = document.querySelector("#training-dialog");
@@ -63,11 +64,13 @@ function openDialog(mode, row = null) {
   if (mode === "create") {
     dialogTitle.textContent = "Add Vocabulary";
     form.elements.id.value = "";
+    saveAddBtn.hidden = false;
   } else {
     dialogTitle.textContent = "Edit Vocabulary";
     form.elements.id.value = row.dataset.id;
     form.elements.front.value = row.dataset.front;
     form.elements.back.value = row.dataset.back;
+    saveAddBtn.hidden = true;
   }
 
   dialog.showModal();
@@ -154,6 +157,22 @@ addBtn.addEventListener("click", () => openDialog("create"));
 
 // Cancel button closes dialog
 cancelBtn.addEventListener("click", () => dialog.close());
+
+// Save and Add button - saves but keeps dialog open
+saveAddBtn.addEventListener("click", () => {
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  const formData = new FormData(form);
+  const front = formData.get("front");
+  const back = formData.get("back");
+
+  handleCreate(front, back);
+  form.reset();
+  form.elements.front.focus();
+});
 
 // Close dialog on backdrop click
 dialog.addEventListener("click", (event) => {

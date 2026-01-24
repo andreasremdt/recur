@@ -20,7 +20,9 @@ const trainingForm = document.querySelector("#training-form");
 const trainingAnswer = document.querySelector("#training-answer");
 const trainingResult = document.querySelector("#training-result");
 const trainingFeedback = document.querySelector("#training-feedback");
-const trainingCorrectAnswer = document.querySelector("#training-correct-answer");
+const trainingCorrectAnswer = document.querySelector(
+  "#training-correct-answer",
+);
 const trainingNextBtn = document.querySelector("#training-next-btn");
 const trainingSummary = document.querySelector("#training-summary");
 const startTrainingBtn = document.querySelector("#start-training-btn");
@@ -33,11 +35,21 @@ let currentIndex = 0;
 let correctCount = 0;
 let incorrectCount = 0;
 
+const BOX_LABELS = {
+  5: "Box 5 - Mastered",
+  4: "Box 4 - Advanced",
+  3: "Box 3 - Intermediate",
+  2: "Box 2 - Learning",
+  1: "Box 1 - New",
+};
+
 function createRow(word) {
   const row = document.createElement("tr");
   row.dataset.id = word.id;
   row.dataset.front = word.front;
   row.dataset.back = word.back;
+  row.dataset.box = word.box;
+  row.dataset.nextReview = word.next_review;
   row.innerHTML = `
     <td>${word.front}</td>
     <td>${word.back}</td>
@@ -49,6 +61,27 @@ function createRow(word) {
     </td>
   `;
   return row;
+}
+
+function createGroupHeader(box) {
+  const row = document.createElement("tr");
+  row.classList.add("group-header");
+  row.dataset.boxGroup = box;
+  row.innerHTML = `<td colspan="5">${BOX_LABELS[box] || `Box ${box}`}</td>`;
+  return row;
+}
+
+function renderVocabulary(vocabulary) {
+  tbody.innerHTML = "";
+
+  let currentBox = null;
+  for (const word of vocabulary) {
+    if (word.box !== currentBox) {
+      currentBox = word.box;
+      tbody.appendChild(createGroupHeader(currentBox));
+    }
+    tbody.appendChild(createRow(word));
+  }
 }
 
 function updateRowContent(row, word) {
@@ -79,13 +112,37 @@ function openDialog(mode, row = null) {
 async function loadVocabulary() {
   try {
     const vocabulary = await fetcher.get("/api/vocabulary");
-
-    for (const word of vocabulary) {
-      tbody.appendChild(createRow(word));
-    }
+    renderVocabulary(vocabulary);
   } catch (error) {
     console.error("Failed to load vocabulary:", error);
   }
+}
+
+function insertRowInBox(row, box) {
+  // Find the group header for box 1, or create it if it doesn't exist
+  let groupHeader = tbody.querySelector(`tr[data-box-group="${box}"]`);
+
+  if (!groupHeader) {
+    // Need to insert the group header in the right position (box DESC order)
+    groupHeader = createGroupHeader(box);
+    const allHeaders = tbody.querySelectorAll("tr.group-header");
+    let inserted = false;
+
+    for (const header of allHeaders) {
+      if (parseInt(header.dataset.boxGroup) < box) {
+        header.before(groupHeader);
+        inserted = true;
+        break;
+      }
+    }
+
+    if (!inserted) {
+      tbody.appendChild(groupHeader);
+    }
+  }
+
+  // Insert after the group header (at the start of the group for DESC order)
+  groupHeader.after(row);
 }
 
 async function handleCreate(front, back) {
@@ -100,7 +157,7 @@ async function handleCreate(front, back) {
   };
   const row = createRow(optimisticWord);
   row.classList.add("pending");
-  tbody.appendChild(row);
+  insertRowInBox(row, 1);
 
   try {
     const savedWord = await fetcher.post("/api/vocabulary", { front, back });
@@ -123,7 +180,10 @@ async function handleUpdate(id, front, back) {
   row.classList.add("pending");
 
   try {
-    const savedWord = await fetcher.patch(`/api/vocabulary/${id}`, { front, back });
+    const savedWord = await fetcher.patch(`/api/vocabulary/${id}`, {
+      front,
+      back,
+    });
     updateRowContent(row, savedWord);
     row.classList.remove("pending");
   } catch (error) {
@@ -204,7 +264,7 @@ tbody.addEventListener("click", (event) => {
   const target = event.target;
   const row = target.closest("tr");
 
-  if (!row) return;
+  if (!row || row.classList.contains("group-header")) return;
 
   if (target.classList.contains("edit-btn")) {
     openDialog("edit", row);
@@ -319,6 +379,8 @@ async function startTraining() {
 function closeTrainingDialog() {
   trainingDialog.close();
   updateTrainingButton();
+  // Reload vocabulary to update sorting after box changes
+  loadVocabulary();
 }
 
 // Training event listeners

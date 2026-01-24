@@ -6,7 +6,9 @@ db.run("PRAGMA journal_mode = WAL;");
 
 export function getAllVocabulary() {
   return db
-    .query<Vocabulary, SQLQueryBindings[]>("SELECT * FROM vocabulary")
+    .query<Vocabulary, SQLQueryBindings[]>(
+      "SELECT * FROM vocabulary ORDER BY box ASC, next_review ASC",
+    )
     .all();
 }
 

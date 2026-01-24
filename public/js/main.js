@@ -195,6 +195,25 @@ tbody.addEventListener("click", (event) => {
 });
 
 // Training functions
+async function updateTrainingButton() {
+  try {
+    const scheduled = await fetcher.get("/api/training");
+    const count = scheduled.length;
+
+    if (count === 0) {
+      startTrainingBtn.textContent = "Nothing to repeat today";
+      startTrainingBtn.disabled = true;
+    } else {
+      startTrainingBtn.textContent = `Start Training (${count})`;
+      startTrainingBtn.disabled = false;
+    }
+  } catch (error) {
+    console.error("Failed to fetch training count:", error);
+    startTrainingBtn.textContent = "Start Training";
+    startTrainingBtn.disabled = false;
+  }
+}
+
 function showTrainingCard() {
   const word = trainingQueue[currentIndex];
   trainingProgress.textContent = `Card ${currentIndex + 1} of ${trainingQueue.length} (Box ${word.box})`;
@@ -280,6 +299,7 @@ async function startTraining() {
 
 function closeTrainingDialog() {
   trainingDialog.close();
+  updateTrainingButton();
 }
 
 // Training event listeners
@@ -301,3 +321,4 @@ trainingDialog.addEventListener("click", (event) => {
 });
 
 loadVocabulary();
+updateTrainingButton();

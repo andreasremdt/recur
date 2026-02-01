@@ -53,22 +53,28 @@ function renderLanguageDropdown() {
   const options = languageDropdown.querySelectorAll("option:not(#add-language-option)");
   options.forEach((opt) => opt.remove());
 
-  // Add language options before the "Add language" option
-  for (const lang of languages) {
-    const option = document.createElement("option");
-    option.value = lang.id;
-    option.textContent = lang.name;
-    if (currentLanguage && lang.id === currentLanguage.id) {
-      option.selected = true;
-    }
-    languageDropdown.insertBefore(option, addLanguageOption);
-  }
-
-  // Show/hide the switcher based on whether there are languages
+  // Add placeholder when no languages exist
   if (languages.length === 0) {
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "No language";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    languageDropdown.insertBefore(placeholder, addLanguageOption);
     languageSwitcher.classList.add("no-languages");
   } else {
     languageSwitcher.classList.remove("no-languages");
+    
+    // Add language options before the "Add language" option
+    for (const lang of languages) {
+      const option = document.createElement("option");
+      option.value = lang.id;
+      option.textContent = lang.name;
+      if (currentLanguage && lang.id === currentLanguage.id) {
+        option.selected = true;
+      }
+      languageDropdown.insertBefore(option, addLanguageOption);
+    }
   }
 }
 

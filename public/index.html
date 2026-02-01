@@ -21,7 +21,13 @@
 </head>
 <body>
   <div class="container">
-    <h1>Memrise</h1>
+    <header class="app-header">
+      <h1>Memrise</h1>
+      <div class="user-menu">
+        <span id="user-name" class="user-name"></span>
+        <button type="button" id="logout-btn" class="button is-secondary is-normal">Sign out</button>
+      </div>
+    </header>
 
     <div class="actions">
       <button type="button" id="add-vocabulary-btn" class="button is-secondary is-rounded is-icon-only is-large" title="Add vocabulary">
@@ -72,11 +78,11 @@
       <input type="hidden" name="id">
       <label>
         Front
-        <input type="text" name="front" placeholder="e.g. hello" required>
+        <input type="text" name="front" class="input" placeholder="e.g. hello" required>
       </label>
       <label>
         Back
-        <input type="text" name="back" placeholder="e.g. hola" required>
+        <input type="text" name="back" class="input" placeholder="e.g. hola" required>
       </label>
       <div class="dialog-actions">
         <button type="button" id="dialog-cancel-btn" class="button is-secondary is-normal">Cancel</button>
@@ -93,7 +99,7 @@
       <div id="training-card">
         <p id="training-front" class="card-front"></p>
         <form id="training-form">
-          <input type="text" id="training-answer" placeholder="Type your answer..." autocomplete="off" required>
+          <input type="text" id="training-answer" class="input" placeholder="Type your answer..." autocomplete="off" required>
           <button type="submit" class="button is-primary is-normal">Check</button>
         </form>
         <div id="training-result" hidden>

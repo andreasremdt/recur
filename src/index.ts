@@ -18,6 +18,18 @@ const server = Bun.serve({
     "/api/training/:id": {
       POST: controller.training.review,
     },
+    "/api/auth/register": {
+      POST: controller.auth.register,
+    },
+    "/api/auth/login": {
+      POST: controller.auth.login,
+    },
+    "/api/auth/logout": {
+      POST: controller.auth.logout,
+    },
+    "/api/auth/me": {
+      GET: controller.auth.me,
+    },
     "/*": controller.static,
   },
 });

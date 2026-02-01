@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - Memrise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/buttons.css">
+  <link rel="stylesheet" href="/css/forms.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <h1>Create account</h1>
+      <p class="auth-subtitle">Start your learning journey</p>
+
+      <form id="register-form">
+        <div id="error-message" class="error-message" hidden></div>
+        
+        <label>
+          Name
+          <input type="text" name="name" class="input" placeholder="Your name" required autocomplete="name">
+        </label>
+
+        <label>
+          Email
+          <input type="email" name="email" class="input" placeholder="you@example.com" required autocomplete="email">
+        </label>
+        
+        <label>
+          Password
+          <input type="password" name="password" class="input" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+        </label>
+
+        <label>
+          Confirm Password
+          <input type="password" name="confirmPassword" class="input" placeholder="Confirm your password" required minlength="8" autocomplete="new-password">
+        </label>
+
+        <button type="submit" class="button is-primary is-normal is-full-width">Create account</button>
+      </form>
+
+      <p class="auth-footer">
+        Already have an account? <a href="/login.html">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module">
+    const form = document.getElementById('register-form');
+    const errorMessage = document.getElementById('error-message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMessage.hidden = true;
+
+      const formData = new FormData(form);
+      const password = formData.get('password');
+      const confirmPassword = formData.get('confirmPassword');
+
+      if (password !== confirmPassword) {
+        errorMessage.textContent = 'Passwords do not match';
+        errorMessage.hidden = false;
+        return;
+      }
+
+      const data = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        password: password,
+      };
+
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const result = await response.json();
+          throw new Error(result.error || 'Registration failed');
+        }
+
+        // Registration automatically logs in, redirect to home
+        window.location.href = '/';
+      } catch (error) {
+        errorMessage.textContent = error.message;
+        errorMessage.hidden = false;
+      }
+    });
+  </script>
+</body>
+</html>

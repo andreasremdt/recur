@@ -5,6 +5,29 @@
     padding-inline: 1rem;
   }
 
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-block: 1rem;
+  }
+
+  .app-header h1 {
+    margin: 0;
+  }
+
+  .user-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .user-name {
+    font-size: 0.875rem;
+    color: var(--color-neutral-600);
+  }
+
   button[title="Add vocabulary"] {
     position: fixed;
     bottom: 2rem;

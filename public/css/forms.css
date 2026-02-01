@@ -11,7 +11,7 @@
     }
   }
 
-  input[type="text"] {
+  .input {
     display: block;
     inline-size: 100%;
     padding: 0.5rem 0.75rem;

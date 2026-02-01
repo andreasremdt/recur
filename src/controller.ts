@@ -11,6 +11,9 @@ import {
   getSessionWithUser,
   deleteSession,
   updateLastLogin,
+  getAllLanguages,
+  createLanguage,
+  deleteLanguage,
 } from "./db";
 import type { User } from "./types";
 
@@ -70,6 +73,15 @@ const controller = {
       }
 
       const url = new URL(request.url);
+      const languageId = url.searchParams.get("languageId");
+      
+      if (!languageId) {
+        return Response.json(
+          { error: "languageId is required" },
+          { status: 400 },
+        );
+      }
+
       const sortBy = url.searchParams.get("sortBy") as
         | "front"
         | "box"
@@ -86,6 +98,7 @@ const controller = {
       return Response.json(
         getAllVocabulary(
           user.id,
+          languageId,
           sortBy ?? undefined,
           sortDir ?? undefined,
           limit,
@@ -102,17 +115,18 @@ const controller = {
       const body = (await request.json()) as {
         front?: string;
         back?: string;
+        languageId?: string;
       };
-      const { front, back } = body;
+      const { front, back, languageId } = body;
 
-      if (!front || !back) {
+      if (!front || !back || !languageId) {
         return Response.json(
-          { error: "front and back are required" },
+          { error: "front, back, and languageId are required" },
           { status: 400 },
         );
       }
 
-      const vocabulary = createVocabulary(front, back, user.id);
+      const vocabulary = createVocabulary(front, back, user.id, languageId);
 
       return Response.json(vocabulary, { status: 201 });
     },
@@ -160,7 +174,17 @@ const controller = {
         return Response.json({ error: "Unauthorized" }, { status: 401 });
       }
 
-      return Response.json(getScheduledVocabulary(user.id));
+      const url = new URL(request.url);
+      const languageId = url.searchParams.get("languageId");
+      
+      if (!languageId) {
+        return Response.json(
+          { error: "languageId is required" },
+          { status: 400 },
+        );
+      }
+
+      return Response.json(getScheduledVocabulary(user.id, languageId));
     },
     review: async (request: Bun.BunRequest<"/api/training/:id">) => {
       const user = getAuthenticatedUser(request);
@@ -185,6 +209,52 @@ const controller = {
       }
 
       return Response.json(vocabulary);
+    },
+  },
+
+  languages: {
+    index: (request: Bun.BunRequest<"/api/languages">) => {
+      const user = getAuthenticatedUser(request);
+      if (!user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
+      return Response.json(getAllLanguages(user.id));
+    },
+    create: async (request: Bun.BunRequest<"/api/languages">) => {
+      const user = getAuthenticatedUser(request);
+      if (!user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
+      const body = (await request.json()) as { name?: string };
+      const { name } = body;
+
+      if (!name) {
+        return Response.json(
+          { error: "name is required" },
+          { status: 400 },
+        );
+      }
+
+      const language = createLanguage(name, user.id);
+
+      return Response.json(language, { status: 201 });
+    },
+    delete: (request: Bun.BunRequest<"/api/languages/:id">) => {
+      const user = getAuthenticatedUser(request);
+      if (!user) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
+      const id = request.params.id;
+      const deleted = deleteLanguage(id, user.id);
+
+      if (!deleted) {
+        return Response.json({ error: "Not found" }, { status: 404 });
+      }
+
+      return new Response(null, { status: 204 });
     },
   },
 

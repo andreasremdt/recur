@@ -18,6 +18,13 @@ const server = Bun.serve({
     "/api/training/:id": {
       POST: controller.training.review,
     },
+    "/api/languages": {
+      GET: controller.languages.index,
+      POST: controller.languages.create,
+    },
+    "/api/languages/:id": {
+      DELETE: controller.languages.delete,
+    },
     "/api/auth/register": {
       POST: controller.auth.register,
     },

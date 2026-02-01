@@ -5,8 +5,16 @@ export type Vocabulary = {
   box: number;
   next_review: string;
   user_id: string | null;
+  language_id: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type Language = {
+  id: string;
+  name: string;
+  user_id: string;
+  created_at: string;
 };
 
 export type User = {

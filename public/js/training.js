@@ -23,10 +23,15 @@ let trainingQueue = [];
 let currentIndex = 0;
 let correctCount = 0;
 let incorrectCount = 0;
+let currentLanguage = null;
 
 // Callbacks
 let onTrainingComplete = null;
 let onAnswerSubmitted = null;
+
+export function setCurrentLanguage(language) {
+  currentLanguage = language;
+}
 
 export function setOnTrainingComplete(callback) {
   onTrainingComplete = callback;
@@ -92,8 +97,14 @@ function nextCard() {
 }
 
 async function startTraining() {
+  if (!currentLanguage) {
+    console.error("No language selected");
+    return;
+  }
+
   try {
-    trainingQueue = await fetcher.get("/api/training");
+    const params = new URLSearchParams({ languageId: currentLanguage.id });
+    trainingQueue = await fetcher.get(`/api/training?${params}`);
     currentIndex = 0;
     correctCount = 0;
     incorrectCount = 0;
@@ -123,8 +134,15 @@ function closeTrainingDialog() {
 }
 
 export async function updateTrainingButton() {
+  if (!currentLanguage) {
+    startTrainingBtn.textContent = "No language selected";
+    startTrainingBtn.disabled = true;
+    return;
+  }
+
   try {
-    const scheduled = await fetcher.get("/api/training");
+    const params = new URLSearchParams({ languageId: currentLanguage.id });
+    const scheduled = await fetcher.get(`/api/training?${params}`);
     const count = scheduled.length;
 
     if (count === 0) {
@@ -159,5 +177,5 @@ export function init() {
     }
   });
 
-  updateTrainingButton();
+  // Note: updateTrainingButton will be called by the language switcher when a language is selected
 }

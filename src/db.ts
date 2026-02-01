@@ -1,5 +1,5 @@
 import { Database, type SQLQueryBindings } from "bun:sqlite";
-import type { Vocabulary, User, Session } from "./types";
+import type { Vocabulary, User, Session, Language } from "./types";
 
 const db = new Database("dev.db");
 db.run("PRAGMA journal_mode = WAL;");
@@ -13,6 +13,7 @@ const VALID_SORT_DIRECTIONS: SortDirection[] = ["ASC", "DESC"];
 
 export function getAllVocabulary(
   userId: string,
+  languageId: string,
   sortBy: SortField = "next_review",
   sortDir: SortDirection = "ASC",
   limit: number = 50,
@@ -23,27 +24,27 @@ export function getAllVocabulary(
   const direction = VALID_SORT_DIRECTIONS.includes(sortDir) ? sortDir : "ASC";
 
   const data = db
-    .query<Vocabulary, [string, number, number]>(
-      `SELECT * FROM vocabulary WHERE user_id = ? ORDER BY ${field} ${direction} LIMIT ? OFFSET ?`,
+    .query<Vocabulary, [string, string, number, number]>(
+      `SELECT * FROM vocabulary WHERE user_id = ? AND language_id = ? ORDER BY ${field} ${direction} LIMIT ? OFFSET ?`,
     )
-    .all(userId, limit, offset);
+    .all(userId, languageId, limit, offset);
 
   const total = db
-    .query<{ count: number }, [string]>("SELECT COUNT(*) as count FROM vocabulary WHERE user_id = ?")
-    .get(userId)!.count;
+    .query<{ count: number }, [string, string]>("SELECT COUNT(*) as count FROM vocabulary WHERE user_id = ? AND language_id = ?")
+    .get(userId, languageId)!.count;
 
   return { data, total };
 }
 
-export function createVocabulary(front: string, back: string, userId: string): Vocabulary {
+export function createVocabulary(front: string, back: string, userId: string, languageId: string): Vocabulary {
   const id = crypto.randomUUID();
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const nextReview = tomorrow.toISOString().slice(0, 10);
 
   db.run(
-    "INSERT INTO vocabulary (id, front, back, box, next_review, user_id) VALUES (?, ?, ?, ?, ?, ?)",
-    [id, front, back, 1, nextReview, userId],
+    "INSERT INTO vocabulary (id, front, back, box, next_review, user_id, language_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [id, front, back, 1, nextReview, userId, languageId],
   );
 
   return db
@@ -91,15 +92,15 @@ export function deleteVocabulary(id: string): boolean {
   return true;
 }
 
-export function getScheduledVocabulary(userId: string): Vocabulary[] {
+export function getScheduledVocabulary(userId: string, languageId: string): Vocabulary[] {
   const today = new Date().toISOString().slice(0, 10);
 
   return db
     .query<
       Vocabulary,
-      [string, string]
-    >("SELECT * FROM vocabulary WHERE user_id = ? AND next_review <= ? ORDER BY box ASC, next_review ASC")
-    .all(userId, today);
+      [string, string, string]
+    >("SELECT * FROM vocabulary WHERE user_id = ? AND language_id = ? AND next_review <= ? ORDER BY box ASC, next_review ASC")
+    .all(userId, languageId, today);
 }
 
 // SM-2 intervals: Box 1 = 1 day, Box 2 = 2 days, Box 3 = 4 days, Box 4 = 7 days, Box 5 = 14 days
@@ -267,4 +268,47 @@ export function updateLastLogin(userId: string): void {
     "UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?",
     [userId],
   );
+}
+
+// ==================== Language Functions ====================
+
+export function getAllLanguages(userId: string): Language[] {
+  return db
+    .query<Language, [string]>("SELECT * FROM languages WHERE user_id = ? ORDER BY name ASC")
+    .all(userId);
+}
+
+export function createLanguage(name: string, userId: string): Language {
+  const id = crypto.randomUUID();
+
+  db.run(
+    "INSERT INTO languages (id, name, user_id) VALUES (?, ?, ?)",
+    [id, name, userId],
+  );
+
+  return db
+    .query<Language, [string]>("SELECT * FROM languages WHERE id = ?")
+    .get(id)!;
+}
+
+export function deleteLanguage(id: string, userId: string): boolean {
+  const existing = db
+    .query<Language, [string, string]>("SELECT * FROM languages WHERE id = ? AND user_id = ?")
+    .get(id, userId);
+
+  if (!existing) {
+    return false;
+  }
+
+  // Delete all vocabulary associated with this language first
+  db.run("DELETE FROM vocabulary WHERE language_id = ?", [id]);
+  db.run("DELETE FROM languages WHERE id = ?", [id]);
+
+  return true;
+}
+
+export function getLanguageById(id: string, userId: string): Language | null {
+  return db
+    .query<Language, [string, string]>("SELECT * FROM languages WHERE id = ? AND user_id = ?")
+    .get(id, userId) ?? null;
 }

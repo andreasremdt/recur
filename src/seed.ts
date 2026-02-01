@@ -7,6 +7,7 @@ console.log("Creating database schema...");
 // Drop tables in correct order (foreign key constraints)
 db.run("DROP TABLE IF EXISTS sessions");
 db.run("DROP TABLE IF EXISTS vocabulary");
+db.run("DROP TABLE IF EXISTS languages");
 db.run("DROP TABLE IF EXISTS users");
 
 // Create users table
@@ -33,6 +34,17 @@ db.run(`
   )
 `);
 
+// Create languages table
+db.run(`
+  CREATE TABLE languages (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  )
+`);
+
 // Create vocabulary table
 db.run(`
   CREATE TABLE vocabulary (
@@ -42,9 +54,11 @@ db.run(`
     box INTEGER NOT NULL DEFAULT 1,
     next_review DATE NOT NULL,
     user_id TEXT,
+    language_id TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (language_id) REFERENCES languages(id) ON DELETE CASCADE
   )
 `);
 
@@ -86,37 +100,51 @@ console.log("Seeded 2 test users.");
 console.log("  - john@example.com / password123");
 console.log("  - jane@example.com / securepass456");
 
-// Seed vocabulary (linked to first test user)
-const insertVocabulary = db.prepare(`
-  INSERT OR IGNORE INTO vocabulary (id, front, back, box, next_review, user_id)
-  VALUES (?, ?, ?, ?, ?, ?)
+// Seed languages
+const spanishLanguageId = crypto.randomUUID();
+const frenchLanguageId = crypto.randomUUID();
+
+const insertLanguage = db.prepare(`
+  INSERT INTO languages (id, name, user_id)
+  VALUES (?, ?, ?)
 `);
 
-const vocabulary: [string, string, string, number, string, string][] = [
+insertLanguage.run(spanishLanguageId, "Spanish", testUserId);
+insertLanguage.run(frenchLanguageId, "French", testUserId);
+
+console.log("Seeded 2 languages for john@example.com (Spanish, French).");
+
+// Seed vocabulary (linked to first test user and Spanish language)
+const insertVocabulary = db.prepare(`
+  INSERT OR IGNORE INTO vocabulary (id, front, back, box, next_review, user_id, language_id)
+  VALUES (?, ?, ?, ?, ?, ?, ?)
+`);
+
+const vocabulary: [string, string, string, number, string, string, string][] = [
   // Box 1 - Daily review (due today and yesterday)
-  [crypto.randomUUID(), "hello", "hola", 1, getDate(-1), testUserId],
-  [crypto.randomUUID(), "goodbye", "adiós", 1, getDate(0), testUserId],
-  [crypto.randomUUID(), "thank you", "gracias", 1, getDate(0), testUserId],
+  [crypto.randomUUID(), "hello", "hola", 1, getDate(-1), testUserId, spanishLanguageId],
+  [crypto.randomUUID(), "goodbye", "adiós", 1, getDate(0), testUserId, spanishLanguageId],
+  [crypto.randomUUID(), "thank you", "gracias", 1, getDate(0), testUserId, spanishLanguageId],
 
   // Box 2 - Review every 2 days
-  [crypto.randomUUID(), "please", "por favor", 2, getDate(0), testUserId],
-  [crypto.randomUUID(), "good morning", "buenos días", 2, getDate(1), testUserId],
+  [crypto.randomUUID(), "please", "por favor", 2, getDate(0), testUserId, spanishLanguageId],
+  [crypto.randomUUID(), "good morning", "buenos días", 2, getDate(1), testUserId, spanishLanguageId],
 
   // Box 3 - Review every 4 days
-  [crypto.randomUUID(), "good evening", "buenas tardes", 3, getDate(0), testUserId],
-  [crypto.randomUUID(), "good night", "buenas noches", 3, getDate(3), testUserId],
+  [crypto.randomUUID(), "good evening", "buenas tardes", 3, getDate(0), testUserId, spanishLanguageId],
+  [crypto.randomUUID(), "good night", "buenas noches", 3, getDate(3), testUserId, spanishLanguageId],
 
   // Box 4 - Review every 7 days
-  [crypto.randomUUID(), "how are you", "¿cómo estás?", 4, getDate(0), testUserId],
-  [crypto.randomUUID(), "I'm fine", "estoy bien", 4, getDate(5), testUserId],
+  [crypto.randomUUID(), "how are you", "¿cómo estás?", 4, getDate(0), testUserId, spanishLanguageId],
+  [crypto.randomUUID(), "I'm fine", "estoy bien", 4, getDate(5), testUserId, spanishLanguageId],
 
   // Box 5 - Review every 14 days (mastered)
-  [crypto.randomUUID(), "yes", "sí", 5, getDate(0), testUserId],
-  [crypto.randomUUID(), "no", "no", 5, getDate(10), testUserId],
+  [crypto.randomUUID(), "yes", "sí", 5, getDate(0), testUserId, spanishLanguageId],
+  [crypto.randomUUID(), "no", "no", 5, getDate(10), testUserId, spanishLanguageId],
 ];
 
 for (const word of vocabulary) {
-  insertVocabulary.run(word[0], word[1], word[2], word[3], word[4], word[5]);
+  insertVocabulary.run(word[0], word[1], word[2], word[3], word[4], word[5], word[6]);
 }
 
 console.log(`Seeded ${vocabulary.length} vocabulary entries for john@example.com.`);

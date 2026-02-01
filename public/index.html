@@ -29,6 +29,11 @@
       <h1>Recur</h1>
       <div class="user-menu">
         <span id="user-name" class="user-name"></span>
+        <div id="language-switcher" class="language-switcher">
+          <select id="language-dropdown" class="language-dropdown">
+            <option id="add-language-option" value="add-new">+ Add language</option>
+          </select>
+        </div>
         <button type="button" id="logout-btn" class="button is-secondary is-normal">Sign out</button>
       </div>
     </header>
@@ -126,6 +131,21 @@
       <p>There are no vocabulary words scheduled for review today.</p>
       <button type="button" id="training-empty-close-btn" class="button is-secondary is-normal">Close</button>
     </div>
+  </dialog>
+
+  <dialog id="language-dialog">
+    <form id="language-form" method="dialog">
+      <h2>Add Language</h2>
+      <label>
+        Select a language
+        <select id="language-select" class="input" required>
+        </select>
+      </label>
+      <div class="dialog-actions">
+        <button type="button" id="language-dialog-cancel" class="button is-secondary is-normal">Cancel</button>
+        <button type="submit" class="button is-primary is-normal">Add</button>
+      </div>
+    </form>
   </dialog>
 
   <script type="module" src="/js/main.js"></script>

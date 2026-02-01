@@ -1,5 +1,6 @@
 const SORT_STORAGE_KEY = "recur_sort";
 const PAGINATION_STORAGE_KEY = "recur_pagination";
+const LANGUAGE_STORAGE_KEY = "recur_language";
 
 const defaultSort = { field: "next_review", dir: "ASC" };
 const defaultPagination = { page: 1, limit: 50 };
@@ -40,4 +41,20 @@ export function loadPagination() {
 
 export function savePagination(pagination) {
   localStorage.setItem(PAGINATION_STORAGE_KEY, JSON.stringify(pagination));
+}
+
+export function loadLanguage() {
+  try {
+    const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return null;
+}
+
+export function saveLanguage(language) {
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, JSON.stringify(language));
 }

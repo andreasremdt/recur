@@ -16,9 +16,14 @@ const paginationNext = document.querySelector("#pagination-next");
 let currentSort = loadSort();
 let currentPagination = loadPagination();
 let totalItems = 0;
+let currentLanguage = null;
 
 // Callbacks
 let onEditClick = null;
+
+export function setCurrentLanguage(language) {
+  currentLanguage = language;
+}
 
 export function setOnEditClick(callback) {
   onEditClick = callback;
@@ -103,8 +108,17 @@ function updateSortHeaders() {
 }
 
 export async function loadVocabulary() {
+  if (!currentLanguage) {
+    // No language selected, show empty state
+    totalItems = 0;
+    renderVocabulary([]);
+    updatePaginationControls();
+    return;
+  }
+
   try {
     const params = new URLSearchParams({
+      languageId: currentLanguage.id,
       sortBy: currentSort.field,
       sortDir: currentSort.dir,
       limit: currentPagination.limit.toString(),
@@ -148,6 +162,11 @@ function changeLimit(limit) {
 }
 
 export async function handleCreate(front, back) {
+  if (!currentLanguage) {
+    console.error("No language selected");
+    return;
+  }
+
   const tempId = crypto.randomUUID();
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -163,7 +182,11 @@ export async function handleCreate(front, back) {
   tbody.prepend(row);
 
   try {
-    const savedWord = await fetcher.post("/api/vocabulary", { front, back });
+    const savedWord = await fetcher.post("/api/vocabulary", {
+      front,
+      back,
+      languageId: currentLanguage.id,
+    });
     row.dataset.id = savedWord.id;
     row.classList.remove("pending");
   } catch (error) {
@@ -269,5 +292,5 @@ export function init() {
     changeLimit(parseInt(event.target.value, 10));
   });
 
-  loadVocabulary();
+  // Note: loadVocabulary will be called by the language switcher when a language is selected
 }

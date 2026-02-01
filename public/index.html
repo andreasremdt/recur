@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Memrise</title>
+  <title>Home - Recur</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
 
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/reset.css">
@@ -19,10 +22,11 @@
   <link rel="stylesheet" href="/css/training.css">
   <link rel="stylesheet" href="/css/pagination.css">
 </head>
+
 <body>
   <div class="container">
     <header class="app-header">
-      <h1>Memrise</h1>
+      <h1>Recur</h1>
       <div class="user-menu">
         <span id="user-name" class="user-name"></span>
         <button type="button" id="logout-btn" class="button is-secondary is-normal">Sign out</button>
@@ -30,9 +34,11 @@
     </header>
 
     <div class="actions">
-      <button type="button" id="add-vocabulary-btn" class="button is-secondary is-rounded is-icon-only is-large" title="Add vocabulary">
+      <button type="button" id="add-vocabulary-btn" class="button is-secondary is-rounded is-icon-only is-large"
+        title="Add vocabulary">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
         </svg>
       </button>
       <button type="button" id="start-training-btn" disabled class="button is-primary is-normal">Loading...</button>
@@ -99,7 +105,8 @@
       <div id="training-card">
         <p id="training-front" class="card-front"></p>
         <form id="training-form">
-          <input type="text" id="training-answer" class="input" placeholder="Type your answer..." autocomplete="off" required>
+          <input type="text" id="training-answer" class="input" placeholder="Type your answer..." autocomplete="off"
+            required>
           <button type="submit" class="button is-primary is-normal">Check</button>
         </form>
         <div id="training-result" hidden>
@@ -123,4 +130,5 @@
 
   <script type="module" src="/js/main.js"></script>
 </body>
+
 </html>

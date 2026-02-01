@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register - Memrise</title>
+  <title>Register - Recur</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
 
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/reset.css">
@@ -15,6 +18,7 @@
   <link rel="stylesheet" href="/css/forms.css">
   <link rel="stylesheet" href="/css/auth.css">
 </head>
+
 <body>
   <div class="auth-container">
     <div class="auth-card">
@@ -23,7 +27,7 @@
 
       <form id="register-form">
         <div id="error-message" class="error-message" hidden></div>
-        
+
         <label>
           Name
           <input type="text" name="name" class="input" placeholder="Your name" required autocomplete="name">
@@ -33,15 +37,17 @@
           Email
           <input type="email" name="email" class="input" placeholder="you@example.com" required autocomplete="email">
         </label>
-        
+
         <label>
           Password
-          <input type="password" name="password" class="input" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password">
+          <input type="password" name="password" class="input" placeholder="At least 8 characters" required
+            minlength="8" autocomplete="new-password">
         </label>
 
         <label>
           Confirm Password
-          <input type="password" name="confirmPassword" class="input" placeholder="Confirm your password" required minlength="8" autocomplete="new-password">
+          <input type="password" name="confirmPassword" class="input" placeholder="Confirm your password" required
+            minlength="8" autocomplete="new-password">
         </label>
 
         <button type="submit" class="button is-primary is-normal is-full-width">Create account</button>
@@ -98,4 +104,5 @@
     });
   </script>
 </body>
+
 </html>

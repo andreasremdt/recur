@@ -15,7 +15,7 @@ import {
 import type { User } from "./types";
 
 const PUBLIC_DIR = new URL("../public", import.meta.url).pathname;
-const SESSION_COOKIE_NAME = "session_id";
+const SESSION_COOKIE_NAME = "recur_session";
 
 // Helper to extract session ID from cookies
 function getSessionIdFromRequest(request: Request): string | null {

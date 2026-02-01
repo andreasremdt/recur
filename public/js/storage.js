@@ -1,5 +1,5 @@
-const SORT_STORAGE_KEY = "memrise_sort";
-const PAGINATION_STORAGE_KEY = "memrise_pagination";
+const SORT_STORAGE_KEY = "recur_sort";
+const PAGINATION_STORAGE_KEY = "recur_pagination";
 
 const defaultSort = { field: "next_review", dir: "ASC" };
 const defaultPagination = { page: 1, limit: 50 };

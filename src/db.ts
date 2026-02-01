@@ -1,7 +1,8 @@
-import { Database, type SQLQueryBindings } from "bun:sqlite";
+import { Database } from "bun:sqlite";
 import type { Vocabulary, User, Session, Language } from "./types";
 
-const db = new Database("dev.db");
+const dbPath = process.env.DB_PATH || "dev.db";
+const db = new Database(dbPath);
 db.run("PRAGMA journal_mode = WAL;");
 db.run("PRAGMA foreign_keys = ON;");
 

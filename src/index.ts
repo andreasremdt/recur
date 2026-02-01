@@ -1,7 +1,7 @@
 import controller from "./controller";
 
 const server = Bun.serve({
-  port: 3000,
+  port: process.env.PORT || 3000,
   routes: {
     "/": controller.index,
     "/api/vocabulary": {

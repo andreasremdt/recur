@@ -35,14 +35,6 @@ let currentIndex = 0;
 let correctCount = 0;
 let incorrectCount = 0;
 
-const BOX_LABELS = {
-  5: "Box 5 - Mastered",
-  4: "Box 4 - Advanced",
-  3: "Box 3 - Intermediate",
-  2: "Box 2 - Learning",
-  1: "Box 1 - New",
-};
-
 const relativeTimeFormatter = new Intl.RelativeTimeFormat("en", {
   numeric: "auto",
 });
@@ -102,23 +94,10 @@ function createRow(word) {
   return row;
 }
 
-function createGroupHeader(box) {
-  const row = document.createElement("tr");
-  row.classList.add("group-header");
-  row.dataset.boxGroup = box;
-  row.innerHTML = `<td colspan="4">${BOX_LABELS[box] || `Box ${box}`}</td>`;
-  return row;
-}
-
 function renderVocabulary(vocabulary) {
   tbody.innerHTML = "";
 
-  let currentBox = null;
   for (const word of vocabulary) {
-    if (word.box !== currentBox) {
-      currentBox = word.box;
-      tbody.appendChild(createGroupHeader(currentBox));
-    }
     tbody.appendChild(createRow(word));
   }
 }
@@ -157,33 +136,6 @@ async function loadVocabulary() {
   }
 }
 
-function insertRowInBox(row, box) {
-  // Find the group header for box 1, or create it if it doesn't exist
-  let groupHeader = tbody.querySelector(`tr[data-box-group="${box}"]`);
-
-  if (!groupHeader) {
-    // Need to insert the group header in the right position (box DESC order)
-    groupHeader = createGroupHeader(box);
-    const allHeaders = tbody.querySelectorAll("tr.group-header");
-    let inserted = false;
-
-    for (const header of allHeaders) {
-      if (parseInt(header.dataset.boxGroup) < box) {
-        header.before(groupHeader);
-        inserted = true;
-        break;
-      }
-    }
-
-    if (!inserted) {
-      tbody.appendChild(groupHeader);
-    }
-  }
-
-  // Insert after the group header (at the start of the group for DESC order)
-  groupHeader.after(row);
-}
-
 async function handleCreate(front, back) {
   // Optimistically add to table
   const tempId = crypto.randomUUID();
@@ -198,7 +150,8 @@ async function handleCreate(front, back) {
   };
   const row = createRow(optimisticWord);
   row.classList.add("pending");
-  insertRowInBox(row, 1);
+  // Prepend to table (sorted by next_review ASC, so newest goes first)
+  tbody.prepend(row);
 
   try {
     const savedWord = await fetcher.post("/api/vocabulary", { front, back });
@@ -305,7 +258,7 @@ tbody.addEventListener("click", (event) => {
   const target = event.target;
   const row = target.closest("tr");
 
-  if (!row || row.classList.contains("group-header")) return;
+  if (!row) return;
 
   if (target.classList.contains("edit-btn")) {
     openDialog("edit", row);

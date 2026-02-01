@@ -9,7 +9,7 @@ export function getAllVocabulary() {
     .query<
       Vocabulary,
       SQLQueryBindings[]
-    >("SELECT * FROM vocabulary ORDER BY box ASC, next_review ASC")
+    >("SELECT * FROM vocabulary ORDER BY next_review ASC")
     .all();
 }
 

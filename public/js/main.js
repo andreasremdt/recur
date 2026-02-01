@@ -43,6 +43,21 @@ const BOX_LABELS = {
   1: "Box 1 - New",
 };
 
+const relativeTimeFormatter = new Intl.RelativeTimeFormat("en", {
+  numeric: "auto",
+});
+
+function formatRelativeDate(dateString) {
+  const date = new Date(dateString + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const diffTime = date.getTime() - today.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+  return relativeTimeFormatter.format(diffDays, "day");
+}
+
 function createRow(word) {
   const row = document.createElement("tr");
   row.dataset.id = word.id;
@@ -56,7 +71,7 @@ function createRow(word) {
       <span class="word-back">${word.back}</span>
     </td>
     <td>${word.box}</td>
-    <td>${word.next_review}</td>
+    <td>${formatRelativeDate(word.next_review)}</td>
     <td>
       <div class="actions">
         <button type="button" class="edit-btn" title="Edit">
@@ -357,8 +372,8 @@ async function checkAnswer(userAnswer) {
     // Update the table row if it exists
     const row = tbody.querySelector(`tr[data-id="${word.id}"]`);
     if (row) {
-      row.children[2].textContent = updated.box;
-      row.children[3].textContent = updated.next_review;
+      row.children[1].textContent = updated.box;
+      row.children[2].textContent = formatRelativeDate(updated.next_review);
     }
   } catch (error) {
     console.error("Failed to update vocabulary:", error);

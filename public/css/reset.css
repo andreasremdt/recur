@@ -1,4 +1,5 @@
 @layer reset {
+
   *,
   *::before,
   *::after {
@@ -15,24 +16,35 @@
 
   body {
     margin: unset;
-    min-block-size: 100dvh;
     line-height: 1.5;
   }
 
-  h1, h2, h3, h4, button, input, label {
+  h1,
+  h2,
+  h3,
+  h4,
+  button,
+  input,
+  label {
     line-height: 1.1;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     text-wrap: balance;
   }
 
-  input, button, textarea, select {
+  input,
+  button,
+  textarea,
+  select {
     font-family: inherit;
     font-size: inherit;
   }
 
-  button > svg {
+  button>svg {
     pointer-events: none;
   }
 

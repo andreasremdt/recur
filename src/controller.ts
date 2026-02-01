@@ -24,9 +24,17 @@ const controller = {
         | "ASC"
         | "DESC"
         | null;
+      const limit = parseInt(url.searchParams.get("limit") ?? "50", 10);
+      const page = parseInt(url.searchParams.get("page") ?? "1", 10);
+      const offset = (page - 1) * limit;
 
       return Response.json(
-        getAllVocabulary(sortBy ?? undefined, sortDir ?? undefined),
+        getAllVocabulary(
+          sortBy ?? undefined,
+          sortDir ?? undefined,
+          limit,
+          offset,
+        ),
       );
     },
     create: async (request: Bun.BunRequest<"/api/vocabulary">) => {

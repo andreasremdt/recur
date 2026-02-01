@@ -13,16 +13,24 @@ const VALID_SORT_DIRECTIONS: SortDirection[] = ["ASC", "DESC"];
 export function getAllVocabulary(
   sortBy: SortField = "next_review",
   sortDir: SortDirection = "ASC",
+  limit: number = 50,
+  offset: number = 0,
 ) {
   // Validate to prevent SQL injection
   const field = VALID_SORT_FIELDS.includes(sortBy) ? sortBy : "next_review";
   const direction = VALID_SORT_DIRECTIONS.includes(sortDir) ? sortDir : "ASC";
 
-  return db
-    .query<Vocabulary, SQLQueryBindings[]>(
-      `SELECT * FROM vocabulary ORDER BY ${field} ${direction}`,
+  const data = db
+    .query<Vocabulary, [number, number]>(
+      `SELECT * FROM vocabulary ORDER BY ${field} ${direction} LIMIT ? OFFSET ?`,
     )
-    .all();
+    .all(limit, offset);
+
+  const total = db
+    .query<{ count: number }, []>("SELECT COUNT(*) as count FROM vocabulary")
+    .get()!.count;
+
+  return { data, total };
 }
 
 export function createVocabulary(front: string, back: string): Vocabulary {

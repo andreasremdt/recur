@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/css/forms.css">
   <link rel="stylesheet" href="/css/dialogs.css">
   <link rel="stylesheet" href="/css/training.css">
+  <link rel="stylesheet" href="/css/pagination.css">
 </head>
 <body>
   <div class="container">
@@ -42,6 +43,27 @@
       </thead>
       <tbody></tbody>
     </table>
+
+    <div id="pagination" class="pagination">
+      <div class="pagination-info">
+        <span id="pagination-range"></span>
+        <span>of</span>
+        <span id="pagination-total"></span>
+      </div>
+      <div class="pagination-controls">
+        <label>
+          Per page:
+          <select id="pagination-limit">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+          </select>
+        </label>
+        <button type="button" id="pagination-prev" class="button is-secondary is-normal" disabled>Previous</button>
+        <button type="button" id="pagination-next" class="button is-secondary is-normal" disabled>Next</button>
+      </div>
+    </div>
   </div>
 
   <dialog id="vocabulary-dialog">

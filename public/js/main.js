@@ -30,6 +30,39 @@ function saveSortToStorage(sort) {
 }
 
 let currentSort = loadSortFromStorage();
+
+// Pagination state
+const PAGINATION_STORAGE_KEY = "memrise_pagination";
+const defaultPagination = { page: 1, limit: 50 };
+
+function loadPaginationFromStorage() {
+  try {
+    const stored = localStorage.getItem(PAGINATION_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed.page && parsed.limit) {
+        return parsed;
+      }
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return defaultPagination;
+}
+
+function savePaginationToStorage(pagination) {
+  localStorage.setItem(PAGINATION_STORAGE_KEY, JSON.stringify(pagination));
+}
+
+let currentPagination = loadPaginationFromStorage();
+let totalItems = 0;
+
+// Pagination elements
+const paginationRange = document.querySelector("#pagination-range");
+const paginationTotal = document.querySelector("#pagination-total");
+const paginationLimit = document.querySelector("#pagination-limit");
+const paginationPrev = document.querySelector("#pagination-prev");
+const paginationNext = document.querySelector("#pagination-next");
 const form = document.querySelector("#vocabulary-form");
 const dialogTitle = document.querySelector("#dialog-title");
 const addBtn = document.querySelector("#add-vocabulary-btn");
@@ -159,13 +192,62 @@ async function loadVocabulary() {
     const params = new URLSearchParams({
       sortBy: currentSort.field,
       sortDir: currentSort.dir,
+      limit: currentPagination.limit.toString(),
+      page: currentPagination.page.toString(),
     });
-    const vocabulary = await fetcher.get(`/api/vocabulary?${params}`);
-    renderVocabulary(vocabulary);
+    const response = await fetcher.get(`/api/vocabulary?${params}`);
+    totalItems = response.total;
+    renderVocabulary(response.data);
+    updatePaginationControls();
   } catch (error) {
     console.error("Failed to load vocabulary:", error);
   }
 }
+
+function updatePaginationControls() {
+  const totalPages = Math.ceil(totalItems / currentPagination.limit);
+  const start = (currentPagination.page - 1) * currentPagination.limit + 1;
+  const end = Math.min(currentPagination.page * currentPagination.limit, totalItems);
+
+  paginationRange.textContent = totalItems > 0 ? `${start}-${end}` : "0";
+  paginationTotal.textContent = totalItems.toString();
+
+  paginationPrev.disabled = currentPagination.page <= 1;
+  paginationNext.disabled = currentPagination.page >= totalPages;
+
+  // Update limit select to match current value
+  paginationLimit.value = currentPagination.limit.toString();
+}
+
+function goToPage(page) {
+  currentPagination.page = page;
+  savePaginationToStorage(currentPagination);
+  loadVocabulary();
+}
+
+function changeLimit(limit) {
+  currentPagination.limit = limit;
+  currentPagination.page = 1; // Reset to first page
+  savePaginationToStorage(currentPagination);
+  loadVocabulary();
+}
+
+paginationPrev.addEventListener("click", () => {
+  if (currentPagination.page > 1) {
+    goToPage(currentPagination.page - 1);
+  }
+});
+
+paginationNext.addEventListener("click", () => {
+  const totalPages = Math.ceil(totalItems / currentPagination.limit);
+  if (currentPagination.page < totalPages) {
+    goToPage(currentPagination.page + 1);
+  }
+});
+
+paginationLimit.addEventListener("change", (event) => {
+  changeLimit(parseInt(event.target.value, 10));
+});
 
 function updateSortHeaders() {
   thead.querySelectorAll("th.sortable").forEach((th) => {
@@ -189,6 +271,10 @@ function handleSort(field) {
     currentSort.field = field;
     currentSort.dir = "ASC";
   }
+
+  // Reset to first page when sorting changes
+  currentPagination.page = 1;
+  savePaginationToStorage(currentPagination);
 
   saveSortToStorage(currentSort);
   updateSortHeaders();

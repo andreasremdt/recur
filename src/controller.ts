@@ -13,7 +13,22 @@ const controller = {
   index: Bun.file(`${PUBLIC_DIR}/index.html`),
 
   vocabulary: {
-    index: () => Response.json(getAllVocabulary()),
+    index: (request: Bun.BunRequest<"/api/vocabulary">) => {
+      const url = new URL(request.url);
+      const sortBy = url.searchParams.get("sortBy") as
+        | "front"
+        | "box"
+        | "next_review"
+        | null;
+      const sortDir = url.searchParams.get("sortDir") as
+        | "ASC"
+        | "DESC"
+        | null;
+
+      return Response.json(
+        getAllVocabulary(sortBy ?? undefined, sortDir ?? undefined),
+      );
+    },
     create: async (request: Bun.BunRequest<"/api/vocabulary">) => {
       const body = (await request.json()) as {
         front?: string;

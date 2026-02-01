@@ -4,12 +4,24 @@ import type { Vocabulary } from "./types";
 const db = new Database("dev.db");
 db.run("PRAGMA journal_mode = WAL;");
 
-export function getAllVocabulary() {
+type SortField = "front" | "box" | "next_review";
+type SortDirection = "ASC" | "DESC";
+
+const VALID_SORT_FIELDS: SortField[] = ["front", "box", "next_review"];
+const VALID_SORT_DIRECTIONS: SortDirection[] = ["ASC", "DESC"];
+
+export function getAllVocabulary(
+  sortBy: SortField = "next_review",
+  sortDir: SortDirection = "ASC",
+) {
+  // Validate to prevent SQL injection
+  const field = VALID_SORT_FIELDS.includes(sortBy) ? sortBy : "next_review";
+  const direction = VALID_SORT_DIRECTIONS.includes(sortDir) ? sortDir : "ASC";
+
   return db
-    .query<
-      Vocabulary,
-      SQLQueryBindings[]
-    >("SELECT * FROM vocabulary ORDER BY next_review ASC")
+    .query<Vocabulary, SQLQueryBindings[]>(
+      `SELECT * FROM vocabulary ORDER BY ${field} ${direction}`,
+    )
     .all();
 }
 

@@ -1,8 +1,35 @@
 import fetcher from "./fetcher.js";
 
 // Vocabulary table elements
-const tbody = document.querySelector("#vocabulary-table tbody");
+const table = document.querySelector("#vocabulary-table");
+const thead = table.querySelector("thead");
+const tbody = table.querySelector("tbody");
 const dialog = document.querySelector("#vocabulary-dialog");
+
+// Sort state
+const SORT_STORAGE_KEY = "memrise_sort";
+const defaultSort = { field: "next_review", dir: "ASC" };
+
+function loadSortFromStorage() {
+  try {
+    const stored = localStorage.getItem(SORT_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed.field && parsed.dir) {
+        return parsed;
+      }
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return defaultSort;
+}
+
+function saveSortToStorage(sort) {
+  localStorage.setItem(SORT_STORAGE_KEY, JSON.stringify(sort));
+}
+
+let currentSort = loadSortFromStorage();
 const form = document.querySelector("#vocabulary-form");
 const dialogTitle = document.querySelector("#dialog-title");
 const addBtn = document.querySelector("#add-vocabulary-btn");
@@ -129,12 +156,51 @@ function openDialog(mode, row = null) {
 
 async function loadVocabulary() {
   try {
-    const vocabulary = await fetcher.get("/api/vocabulary");
+    const params = new URLSearchParams({
+      sortBy: currentSort.field,
+      sortDir: currentSort.dir,
+    });
+    const vocabulary = await fetcher.get(`/api/vocabulary?${params}`);
     renderVocabulary(vocabulary);
   } catch (error) {
     console.error("Failed to load vocabulary:", error);
   }
 }
+
+function updateSortHeaders() {
+  thead.querySelectorAll("th.sortable").forEach((th) => {
+    th.classList.remove("is-active");
+    delete th.dataset.dir;
+  });
+
+  const activeHeader = thead.querySelector(`th[data-sort="${currentSort.field}"]`);
+  if (activeHeader) {
+    activeHeader.classList.add("is-active");
+    activeHeader.dataset.dir = currentSort.dir;
+  }
+}
+
+function handleSort(field) {
+  if (currentSort.field === field) {
+    // Toggle direction
+    currentSort.dir = currentSort.dir === "ASC" ? "DESC" : "ASC";
+  } else {
+    // New field, default to ASC
+    currentSort.field = field;
+    currentSort.dir = "ASC";
+  }
+
+  saveSortToStorage(currentSort);
+  updateSortHeaders();
+  loadVocabulary();
+}
+
+thead.addEventListener("click", (event) => {
+  const th = event.target.closest("th.sortable");
+  if (th) {
+    handleSort(th.dataset.sort);
+  }
+});
 
 async function handleCreate(front, back) {
   // Optimistically add to table
@@ -395,5 +461,6 @@ trainingDialog.addEventListener("click", (event) => {
   }
 });
 
+updateSortHeaders();
 loadVocabulary();
 updateTrainingButton();

@@ -1,0 +1,68 @@
+@layer components {
+  #training-dialog {
+    max-inline-size: min(90vw, 24rem);
+    text-align: center;
+  }
+
+  #training-progress {
+    font-size: 13px;
+    color: var(--color-neutral-500);
+    margin-bottom: 1.5rem;
+  }
+
+  #training-card {
+    background-color: var(--color-neutral-50);
+    border: 1px solid var(--color-neutral-200);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+  }
+
+  #training-front {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-neutral-900);
+    margin-bottom: 1.5rem;
+  }
+
+  #training-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    & input {
+      text-align: center;
+    }
+  }
+
+  #training-result {
+    & p:first-child {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    & p:last-of-type {
+      font-size: 14px;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .feedback-correct {
+    color: oklch(0.55 0.15 145);
+  }
+
+  .feedback-incorrect {
+    color: oklch(0.55 0.2 25);
+  }
+
+  #training-complete,
+  #training-empty {
+    & h2 {
+      margin-bottom: 0.5rem;
+    }
+
+    & p {
+      margin-bottom: 1.5rem;
+    }
+  }
+}

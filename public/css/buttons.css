@@ -1,0 +1,59 @@
+@layer components {
+  .button {
+    border: 1px solid transparent;
+    border-radius: 0.25em;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+
+    &.is-rounded {
+      border-radius: 9999px;
+    }
+
+    &.is-normal {
+      padding-inline: 2ex;
+      block-size: 2.25rem;
+    }
+
+    &.is-large {
+      padding-inline: 3ex;
+      block-size: 3rem;
+    }
+
+    &.is-icon-only {
+      padding-inline: unset;
+      aspect-ratio: 1;
+    }
+
+    &.is-primary {
+      color: var(--color-white);
+      box-shadow:
+        0 0 0 1px var(--color-brand-600),
+        0 2px 3px oklch(from var(--color-black) l c h / 0.15);
+      background:
+        linear-gradient(var(--color-brand-600)) padding-box,
+        linear-gradient(to bottom, var(--color-brand-500), var(--color-brand-600)) border-box;
+  
+      &:focus-visible {
+        outline: 2px solid var(--color-brand-500);
+        outline-offset: 2px;
+      }
+    }
+
+    &.is-secondary {
+      color: var(--color-neutral-800);
+      box-shadow:
+        0 0 0 1px var(--color-neutral-300),
+        0 2px 3px oklch(from var(--color-black) l c h / 0.075);
+      background:
+        linear-gradient(var(--color-white)) padding-box,
+        linear-gradient(to bottom, var(--color-white), var(--color-neutral-100)) border-box;
+
+      &:focus-visible {
+        outline: 2px solid var(--color-neutral-400);
+        outline-offset: 2px;
+      }
+    }
+  }
+}

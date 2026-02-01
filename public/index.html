@@ -4,25 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Memrise</title>
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layouts.css">
+  <link rel="stylesheet" href="/css/buttons.css">
+  <link rel="stylesheet" href="/css/tables.css">
+  <link rel="stylesheet" href="/css/forms.css">
+  <link rel="stylesheet" href="/css/dialogs.css">
+  <link rel="stylesheet" href="/css/training.css">
 </head>
 <body>
   <div class="container">
     <h1>Memrise</h1>
 
     <div class="actions">
-      <button type="button" id="add-vocabulary-btn">Add Vocabulary</button>
-      <button type="button" id="start-training-btn" disabled>Loading...</button>
+      <button type="button" id="add-vocabulary-btn" class="button is-secondary is-rounded is-icon-only is-large" title="Add vocabulary">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <button type="button" id="start-training-btn" disabled class="button is-primary is-normal">Loading...</button>
     </div>
 
-    <table id="vocabulary-table">
+    <table id="vocabulary-table" class="table">
       <thead>
         <tr>
-          <th>Front</th>
-          <th>Back</th>
+          <th>Word</th>
           <th>Box</th>
           <th>Next Review</th>
-          <th>Actions</th>
+          <th width="100"></th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -42,9 +57,9 @@
         <input type="text" name="back" placeholder="e.g. hola" required>
       </label>
       <div class="dialog-actions">
-        <button type="button" id="dialog-cancel-btn">Cancel</button>
-        <button type="button" id="dialog-save-add-btn">Save and Add</button>
-        <button type="submit" id="dialog-submit-btn">Save</button>
+        <button type="button" id="dialog-cancel-btn" class="button is-secondary is-normal">Cancel</button>
+        <button type="button" id="dialog-save-add-btn" class="button is-secondary is-normal">Save and Add</button>
+        <button type="submit" id="dialog-submit-btn" class="button is-primary is-normal">Save</button>
       </div>
     </form>
   </dialog>
@@ -57,24 +72,24 @@
         <p id="training-front" class="card-front"></p>
         <form id="training-form">
           <input type="text" id="training-answer" placeholder="Type your answer..." autocomplete="off" required>
-          <button type="submit">Check</button>
+          <button type="submit" class="button is-primary is-normal">Check</button>
         </form>
         <div id="training-result" hidden>
           <p id="training-feedback"></p>
           <p>Correct answer: <strong id="training-correct-answer"></strong></p>
-          <button type="button" id="training-next-btn">Next</button>
+          <button type="button" id="training-next-btn" class="button is-primary is-normal">Next</button>
         </div>
       </div>
     </div>
     <div id="training-complete" hidden>
       <h2>Training Complete!</h2>
       <p id="training-summary"></p>
-      <button type="button" id="training-close-btn">Close</button>
+      <button type="button" id="training-close-btn" class="button is-primary is-normal">Close</button>
     </div>
     <div id="training-empty" hidden>
       <h2>No Words to Review</h2>
       <p>There are no vocabulary words scheduled for review today.</p>
-      <button type="button" id="training-empty-close-btn">Close</button>
+      <button type="button" id="training-empty-close-btn" class="button is-secondary is-normal">Close</button>
     </div>
   </dialog>
 

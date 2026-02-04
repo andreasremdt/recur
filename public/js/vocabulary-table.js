@@ -1,6 +1,11 @@
 import fetcher from "./fetcher.js";
 import { formatRelativeDate } from "./utils.js";
-import { loadSort, saveSort, loadPagination, savePagination } from "./storage.js";
+import {
+  loadSort,
+  saveSort,
+  loadPagination,
+  savePagination,
+} from "./storage.js";
 
 // Elements
 const table = document.querySelector("#vocabulary-table");
@@ -82,10 +87,8 @@ function renderVocabulary(vocabulary) {
 
 function updatePaginationControls() {
   const totalPages = Math.ceil(totalItems / currentPagination.limit);
-  const start = (currentPagination.page - 1) * currentPagination.limit + 1;
-  const end = Math.min(currentPagination.page * currentPagination.limit, totalItems);
 
-  paginationRange.textContent = totalItems > 0 ? `${start}-${end}` : "0";
+  paginationRange.textContent = totalItems > 0 ? currentPagination.page : "0";
   paginationTotal.textContent = totalItems.toString();
 
   paginationPrev.disabled = currentPagination.page <= 1;
@@ -100,7 +103,9 @@ function updateSortHeaders() {
     delete th.dataset.dir;
   });
 
-  const activeHeader = thead.querySelector(`th[data-sort="${currentSort.field}"]`);
+  const activeHeader = thead.querySelector(
+    `th[data-sort="${currentSort.field}"]`,
+  );
   if (activeHeader) {
     activeHeader.classList.add("is-active");
     activeHeader.dataset.dir = currentSort.dir;
@@ -208,7 +213,10 @@ export async function handleUpdate(id, front, back) {
   row.classList.add("pending");
 
   try {
-    const savedWord = await fetcher.patch(`/api/vocabulary/${id}`, { front, back });
+    const savedWord = await fetcher.patch(`/api/vocabulary/${id}`, {
+      front,
+      back,
+    });
     row.dataset.front = savedWord.front;
     row.dataset.back = savedWord.back;
     row.querySelector(".word-front").textContent = savedWord.front;

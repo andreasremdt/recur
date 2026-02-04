@@ -20,11 +20,10 @@
   <link rel="stylesheet" href="/css/forms.css">
   <link rel="stylesheet" href="/css/dialogs.css">
   <link rel="stylesheet" href="/css/training.css">
-  <link rel="stylesheet" href="/css/pagination.css">
 </head>
 
 <body>
-  <div class="container">
+  <main class="container">
     <header class="app-header">
       <h1>Recur</h1>
       <div class="user-menu">
@@ -38,7 +37,7 @@
       </div>
     </header>
 
-    <div class="actions">
+    <!-- <div class="actions">
       <button type="button" id="add-vocabulary-btn" class="button is-secondary is-rounded is-icon-only is-large"
         title="Add vocabulary">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -47,41 +46,60 @@
         </svg>
       </button>
       <button type="button" id="start-training-btn" disabled class="button is-primary is-normal">Loading...</button>
-    </div>
+    </div> -->
 
-    <table id="vocabulary-table" class="table">
-      <thead>
-        <tr>
-          <th data-sort="front" class="sortable">Word</th>
-          <th data-sort="box" class="sortable">Box</th>
-          <th data-sort="next_review" class="sortable">Next Review</th>
-          <th width="100"></th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    
+      <header class="table-header">
+        <div class="left">
+          <h1 class="title">Your vocabulary <span class="count">240 words</span></h1>
+          <p class="description">You're making great progress, keep it up!</p>
+        </div>
 
-    <div id="pagination" class="pagination">
-      <div class="pagination-info">
-        <span id="pagination-range"></span>
-        <span>of</span>
-        <span id="pagination-total"></span>
-      </div>
-      <div class="pagination-controls">
-        <label>
+        <button type="button" id="add-vocabulary-btn" class="button is-secondary is-normal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          Add
+        </button>
+        <button type="button" id="start-training-btn" disabled class="button is-primary is-normal">Loading...</button>
+      </header>
+      
+      <table class="table-content" id="vocabulary-table">
+        <thead>
+          <tr>
+            <th data-sort="front" class="sortable">Word</th>
+            <th data-sort="box" class="sortable">Box</th>
+            <th data-sort="next_review" class="sortable">Next Review</th>
+            <th width="100"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div id="pagination" class="table-pagination">
+        <div class="info">
+          <span>Page</span>
+          <span id="pagination-range"></span>
+          <span>of</span>
+          <span id="pagination-total"></span>
+        </div>
+
+        <label for="pagination-limit" class="label">
           Per page:
-          <select id="pagination-limit">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50" selected>50</option>
-            <option value="100">100</option>
-          </select>
         </label>
+
+        <select id="pagination-limit" class="input">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+        </select>
+        
         <button type="button" id="pagination-prev" class="button is-secondary is-normal" disabled>Previous</button>
         <button type="button" id="pagination-next" class="button is-secondary is-normal" disabled>Next</button>
       </div>
-    </div>
-  </div>
+  </main>
 
   <dialog id="vocabulary-dialog">
     <form id="vocabulary-form" method="dialog">

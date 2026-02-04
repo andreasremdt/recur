@@ -82,29 +82,7 @@ const controller = {
         );
       }
 
-      const sortBy = url.searchParams.get("sortBy") as
-        | "front"
-        | "box"
-        | "next_review"
-        | null;
-      const sortDir = url.searchParams.get("sortDir") as
-        | "ASC"
-        | "DESC"
-        | null;
-      const limit = parseInt(url.searchParams.get("limit") ?? "50", 10);
-      const page = parseInt(url.searchParams.get("page") ?? "1", 10);
-      const offset = (page - 1) * limit;
-
-      return Response.json(
-        getAllVocabulary(
-          user.id,
-          languageId,
-          sortBy ?? undefined,
-          sortDir ?? undefined,
-          limit,
-          offset,
-        ),
-      );
+      return Response.json(getAllVocabulary(user.id, languageId));
     },
     create: async (request: Bun.BunRequest<"/api/vocabulary">) => {
       const user = getAuthenticatedUser(request);

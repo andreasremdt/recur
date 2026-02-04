@@ -6,35 +6,15 @@ const db = new Database(dbPath);
 db.run("PRAGMA journal_mode = WAL;");
 db.run("PRAGMA foreign_keys = ON;");
 
-type SortField = "front" | "box" | "next_review";
-type SortDirection = "ASC" | "DESC";
-
-const VALID_SORT_FIELDS: SortField[] = ["front", "box", "next_review"];
-const VALID_SORT_DIRECTIONS: SortDirection[] = ["ASC", "DESC"];
-
 export function getAllVocabulary(
   userId: string,
   languageId: string,
-  sortBy: SortField = "next_review",
-  sortDir: SortDirection = "ASC",
-  limit: number = 50,
-  offset: number = 0,
-) {
-  // Validate to prevent SQL injection
-  const field = VALID_SORT_FIELDS.includes(sortBy) ? sortBy : "next_review";
-  const direction = VALID_SORT_DIRECTIONS.includes(sortDir) ? sortDir : "ASC";
-
-  const data = db
-    .query<Vocabulary, [string, string, number, number]>(
-      `SELECT * FROM vocabulary WHERE user_id = ? AND language_id = ? ORDER BY ${field} ${direction} LIMIT ? OFFSET ?`,
+): Vocabulary[] {
+  return db
+    .query<Vocabulary, [string, string]>(
+      `SELECT * FROM vocabulary WHERE user_id = ? AND language_id = ?`,
     )
-    .all(userId, languageId, limit, offset);
-
-  const total = db
-    .query<{ count: number }, [string, string]>("SELECT COUNT(*) as count FROM vocabulary WHERE user_id = ? AND language_id = ?")
-    .get(userId, languageId)!.count;
-
-  return { data, total };
+    .all(userId, languageId);
 }
 
 export function createVocabulary(front: string, back: string, userId: string, languageId: string): Vocabulary {

@@ -166,7 +166,7 @@
       font-weight: 500;
     }
 
-    & .input {
+    & .form-control {
       inline-size: 75px;
       margin-inline-end: 1.5rem;
     }

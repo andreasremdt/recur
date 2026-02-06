@@ -33,28 +33,30 @@
       <img src="/icons/logo.svg" alt="Recur" width="48" height="48">
 
       <h1>Welcome back</h1>
-      <p class="auth-subtitle">Sign in to continue learning</p>
+      <p class="auth-subtitle">Sign in to continue your learning journey.</p>
 
       <form id="login-form">
         <div id="error-message" class="error-message" hidden></div>
 
-        <label>
-          Email
-          <input type="email" name="email" class="input" placeholder="you@example.com" required autocomplete="email">
-        </label>
+        <div class="form-group">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
+        </div>
 
-        <label>
-          Password
-          <input type="password" name="password" class="input" placeholder="Enter your password" required
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required
             autocomplete="current-password">
-        </label>
+        </div>
 
-        <label class="checkbox-label">
-          <input type="checkbox" name="rememberMe">
-          <span>Remember me for 30 days</span>
-        </label>
+        <div class="form-group">
+          <label class="form-checkbox">
+            <input type="checkbox" name="rememberMe">
+            Remember me
+          </label>
+        </div>
 
-        <button type="submit" class="button is-primary is-normal is-full-width">Sign in</button>
+        <button type="submit" class="button -primary">Sign in</button>
       </form>
 
       <p class="auth-footer">

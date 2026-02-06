@@ -33,34 +33,34 @@
       <img src="/icons/logo.svg" alt="Recur" width="48" height="48">
       
       <h1>Create account</h1>
-      <p class="auth-subtitle">Start your learning journey</p>
+      <p class="auth-subtitle">Start your learning journey today with a free account.</p>
 
       <form id="register-form">
         <div id="error-message" class="error-message" hidden></div>
 
-        <label>
-          Name
-          <input type="text" name="name" class="input" placeholder="Your name" required autocomplete="name">
-        </label>
+        <div class="form-group">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="Your name" required autocomplete="name">
+        </div>
 
-        <label>
-          Email
-          <input type="email" name="email" class="input" placeholder="you@example.com" required autocomplete="email">
-        </label>
+        <div class="form-group">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" required autocomplete="email">
+        </div>
 
-        <label>
-          Password
-          <input type="password" name="password" class="input" placeholder="At least 8 characters" required
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="At least 8 characters" required
             minlength="8" autocomplete="new-password">
-        </label>
+        </div>
 
-        <label>
-          Confirm Password
-          <input type="password" name="confirmPassword" class="input" placeholder="Confirm your password" required
-            minlength="8" autocomplete="new-password">
-        </label>
+        <div class="form-group">
+          <label for="confirmPassword" class="form-label">Confirm password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirm your password" required
+            minlength="8">
+        </div>
 
-        <button type="submit" class="button is-primary is-normal is-full-width">Create account</button>
+        <button type="submit" class="button -primary">Create account</button>
       </form>
 
       <p class="auth-footer">

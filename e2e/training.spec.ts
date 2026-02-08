@@ -53,13 +53,13 @@ test("answers a question correctly and shows positive feedback", async ({
   const prompt = await page.locator('[data-target="label"]').textContent();
   const correctAnswer = ANSWERS[prompt!.trim()];
 
-  await page.fill('[data-target="input"]', correctAnswer!);
-  await page.click('[data-target="form"] button[type="submit"]');
+  await page.fill('input[id="answer"]', correctAnswer!);
+  await page.click('[data-testid="check-button"]');
 
   // Should show positive feedback
   await expect(page.locator('[data-target="training-result"]')).toBeVisible();
   await expect(page.locator('[data-target="icon"]')).toHaveClass(/-green/);
-  await expect(page.locator('[data-target="form"]')).toBeHidden();
+  await expect(page.locator('[data-target="training-form"]')).toBeHidden();
 });
 
 test("answers a question incorrectly and shows the correct answer", async ({
@@ -76,8 +76,8 @@ test("answers a question incorrectly and shows the correct answer", async ({
   const correctAnswer = ANSWERS[prompt!.trim()];
 
   // Provide a wrong answer
-  await page.fill('[data-target="input"]', "deliberately wrong");
-  await page.click('[data-target="form"] button[type="submit"]');
+  await page.fill('input[id="answer"]', "deliberately wrong");
+  await page.click('[data-testid="check-button"]');
 
   // Should show negative feedback with the correct answer
   await expect(page.locator('[data-target="training-result"]')).toBeVisible();
@@ -85,7 +85,7 @@ test("answers a question incorrectly and shows the correct answer", async ({
   await expect(page.locator('[data-target="correct-answer"]')).toHaveText(
     correctAnswer!,
   );
-  await expect(page.locator('[data-target="form"]')).toBeHidden();
+  await expect(page.locator('[data-target="training-form"]')).toBeHidden();
 });
 
 test("completes a full training session and shows summary", async ({
@@ -105,12 +105,12 @@ test("completes a full training session and shows summary", async ({
     const correctAnswer = ANSWERS[prompt!.trim()];
 
     if (i === 0) {
-      await page.fill('[data-target="input"]', "deliberately wrong");
+      await page.fill('input[id="answer"]', "deliberately wrong");
     } else {
-      await page.fill('[data-target="input"]', correctAnswer!);
+      await page.fill('input[id="answer"]', correctAnswer!);
     }
 
-    await page.click('[data-target="form"] button[type="submit"]');
+    await page.click('[data-testid="check-button"]');
     await expect(page.locator('[data-target="training-result"]')).toBeVisible();
 
     await page.click('[data-target="next"]');
@@ -145,8 +145,8 @@ test("updates the training button after completing a session", async ({
     const prompt = await page.locator('[data-target="label"]').textContent();
     const correctAnswer = ANSWERS[prompt!.trim()];
 
-    await page.fill('[data-target="input"]', correctAnswer!);
-    await page.click('[data-target="form"] button[type="submit"]');
+    await page.fill('input[id="answer"]', correctAnswer!);
+    await page.click('[data-testid="check-button"]');
     await expect(page.locator('[data-target="training-result"]')).toBeVisible();
     await page.click('[data-target="next"]');
   }
@@ -172,8 +172,8 @@ test("shows progress during training", async ({ page }) => {
 
   // Answer first question
   const prompt = await page.locator('[data-target="label"]').textContent();
-  await page.fill('[data-target="input"]', ANSWERS[prompt!.trim()]!);
-  await page.click('[data-target="form"] button[type="submit"]');
+  await page.fill('input[id="answer"]', ANSWERS[prompt!.trim()]!);
+  await page.click('[data-testid="check-button"]');
 
   // Progress should update after answering
   await expect(progressBar).toHaveAttribute("value", "1");
@@ -183,8 +183,8 @@ test("shows progress during training", async ({ page }) => {
 
   // Answer second question
   const prompt2 = await page.locator('[data-target="label"]').textContent();
-  await page.fill('[data-target="input"]', ANSWERS[prompt2!.trim()]!);
-  await page.click('[data-target="form"] button[type="submit"]');
+  await page.fill('input[id="answer"]', ANSWERS[prompt2!.trim()]!);
+  await page.click('[data-testid="check-button"]');
 
   await expect(progressBar).toHaveAttribute("value", "2");
 });

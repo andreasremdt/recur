@@ -16,15 +16,19 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("adds new vocabulary", async ({ page }) => {
-  await page.click("#add-vocabulary-btn");
-  await expect(page.locator("#vocabulary-dialog")).toBeVisible();
-  await expect(page.locator("#dialog-title")).toHaveText("Add vocabulary");
+  await page.click('[data-action="add"]');
+  await expect(page.locator('[data-target="vocabulary-dialog"]')).toBeVisible();
+  await expect(page.locator('[data-target="title"]')).toHaveText(
+    "Add vocabulary",
+  );
 
   await page.fill("#front", "water");
   await page.fill("#back", "agua");
-  await page.click("#dialog-submit-btn");
+  await page.click('[data-testid="save-button"]');
 
-  await expect(page.locator("#vocabulary-dialog")).not.toBeVisible();
+  await expect(
+    page.locator('[data-target="vocabulary-dialog"]'),
+  ).not.toBeVisible();
   await expect(page.locator("#vocabulary-table tbody tr")).toHaveCount(12);
   await expect(page.locator("#vocabulary-table tbody")).toContainText("water");
   await expect(page.locator("#vocabulary-table tbody")).toContainText("agua");
@@ -36,24 +40,26 @@ test("adds new vocabulary", async ({ page }) => {
 test("adds multiple vocabulary entries with 'Save and Add'", async ({
   page,
 }) => {
-  await page.click("#add-vocabulary-btn");
+  await page.click('[data-action="add"]');
 
   // First word — click "Save and Add"
   await page.fill("#front", "water");
   await page.fill("#back", "agua");
-  await page.click("#dialog-save-add-btn");
+  await page.click('[data-action="save-and-add"]');
 
   // Dialog stays open with cleared fields
-  await expect(page.locator("#vocabulary-dialog")).toBeVisible();
+  await expect(page.locator('[data-target="vocabulary-dialog"]')).toBeVisible();
   await expect(page.locator("#front")).toHaveValue("");
   await expect(page.locator("#back")).toHaveValue("");
 
   // Second word — click "Save"
   await page.fill("#front", "fire");
   await page.fill("#back", "fuego");
-  await page.click("#dialog-submit-btn");
+  await page.click('[data-testid="save-button"]');
 
-  await expect(page.locator("#vocabulary-dialog")).not.toBeVisible();
+  await expect(
+    page.locator('[data-target="vocabulary-dialog"]'),
+  ).not.toBeVisible();
   await expect(page.locator("#vocabulary-table tbody tr")).toHaveCount(13);
   await expect(page.locator("#vocabulary-table tbody")).toContainText("water");
   await expect(page.locator("#vocabulary-table tbody")).toContainText("fire");
@@ -61,18 +67,21 @@ test("adds multiple vocabulary entries with 'Save and Add'", async ({
 
 test("edits existing vocabulary", async ({ page }) => {
   const firstRow = page.locator("#vocabulary-table tbody tr").first();
-  const originalFront = await firstRow.locator(".word-front").textContent();
 
   await firstRow.locator(".edit-btn").click();
 
-  await expect(page.locator("#vocabulary-dialog")).toBeVisible();
-  await expect(page.locator("#dialog-title")).toHaveText("Edit vocabulary");
-  await expect(page.locator("#dialog-save-add-btn")).toBeHidden();
+  await expect(page.locator('[data-target="vocabulary-dialog"]')).toBeVisible();
+  await expect(page.locator('[data-target="title"]')).toHaveText(
+    "Edit vocabulary",
+  );
+  await expect(page.locator('[data-action="save-and-add"]')).toBeHidden();
 
   await page.fill("#front", "modified word");
-  await page.click("#dialog-submit-btn");
+  await page.click('[data-testid="save-button"]');
 
-  await expect(page.locator("#vocabulary-dialog")).not.toBeVisible();
+  await expect(
+    page.locator('[data-target="vocabulary-dialog"]'),
+  ).not.toBeVisible();
   await expect(page.locator("#vocabulary-table tbody")).toContainText(
     "modified word",
   );
@@ -110,12 +119,14 @@ test("keeps vocabulary when delete confirmation is dismissed", async ({
 });
 
 test("cancels the add dialog without saving", async ({ page }) => {
-  await page.click("#add-vocabulary-btn");
+  await page.click('[data-action="add"]');
   await page.fill("#front", "should not appear");
   await page.fill("#back", "no debería aparecer");
-  await page.click("#dialog-cancel-btn");
+  await page.click('[data-testid="cancel-button"]');
 
-  await expect(page.locator("#vocabulary-dialog")).not.toBeVisible();
+  await expect(
+    page.locator('[data-target="vocabulary-dialog"]'),
+  ).not.toBeVisible();
   await expect(page.locator("#vocabulary-table tbody tr")).toHaveCount(11);
   await expect(page.locator("#vocabulary-table tbody")).not.toContainText(
     "should not appear",

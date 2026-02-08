@@ -8,8 +8,7 @@ let dialog = document.querySelector('[data-target="training-dialog"]');
 let progress = dialog.querySelector('[data-target="progress-indicator"]');
 
 // Training form
-let form = dialog.querySelector('[data-target="form"]');
-let input = form.querySelector('[data-target="input"]');
+let form = dialog.querySelector('[data-target="training-form"]');
 let label = dialog.querySelector('[data-target="label"]');
 
 // Training result
@@ -78,21 +77,26 @@ function updateProgressIndidcator() {
 }
 
 function showTrainingCard() {
-  const word = trainingQueue[currentIndex];
+  let word = trainingQueue[currentIndex];
 
   setVisibility(result, false);
   setVisibility(form, true);
 
   label.textContent = word.front;
-  input.value = "";
-  input.focus();
+  form.elements.answer.value = "";
+  form.elements.answer.focus();
 }
 
 async function handleSubmit(event) {
+  if (event.submitter.value === "cancel") {
+    return;
+  }
+
   event.preventDefault();
 
   let word = trainingQueue[currentIndex];
-  let isCorrect = normalize(input.value) === normalize(word.back);
+  let isCorrect =
+    normalize(form.elements.answer.value) === normalize(word.back);
   let [successPath, failurePath] = icon.children;
 
   if (isCorrect) {
@@ -123,7 +127,7 @@ async function handleSubmit(event) {
   next.focus();
 
   try {
-    const updated = await fetcher.post(`/api/training/${word.id}`, {
+    let updated = await fetcher.post(`/api/training/${word.id}`, {
       correct: isCorrect,
     });
 
@@ -153,7 +157,8 @@ async function handleStartTraining() {
   }
 
   try {
-    const params = new URLSearchParams({ languageId: currentLanguage.id });
+    let params = new URLSearchParams({ languageId: currentLanguage.id });
+
     trainingQueue = await fetcher.get(`/api/training?${params}`);
     currentIndex = 0;
     correctCount = 0;
@@ -184,9 +189,9 @@ export async function updateTrainingButton() {
   }
 
   try {
-    const params = new URLSearchParams({ languageId: currentLanguage.id });
-    const scheduled = await fetcher.get(`/api/training?${params}`);
-    const count = scheduled.length;
+    let params = new URLSearchParams({ languageId: currentLanguage.id });
+    let scheduled = await fetcher.get(`/api/training?${params}`);
+    let count = scheduled.length;
 
     if (count === 0) {
       startTraining.textContent = "Nothing to repeat today";

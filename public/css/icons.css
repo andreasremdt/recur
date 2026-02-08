@@ -1,0 +1,25 @@
+@layer components {
+  .icon {
+    display: block;
+    box-sizing: content-box;
+    padding: 1rem;
+    border-radius: 50%;
+    background-color: var(--background-color);
+    color: var(--color);
+
+    &.-green {
+      --background-color: var(--color-green-50);
+      --color: var(--color-green-600);
+    }
+
+    &.-red {
+      --background-color: var(--color-red-50);
+      --color: var(--color-red-600);
+    }
+
+    &.-neutral {
+      --background-color: var(--color-neutral-100);
+      --color: var(--color-neutral-600);
+    }
+  }
+}

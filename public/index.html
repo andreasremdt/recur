@@ -24,9 +24,9 @@
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/layouts.css">
   <link rel="stylesheet" href="/css/buttons.css">
+  <link rel="stylesheet" href="/css/icons.css">
   <link rel="stylesheet" href="/css/tables.css">
   <link rel="stylesheet" href="/css/forms.css">
-  <link rel="stylesheet" href="/css/dialogs.css">
   <link rel="stylesheet" href="/css/training.css">
 </head>
 
@@ -58,7 +58,7 @@
           </svg>
           Add
         </button>
-        <button type="button" id="start-training-btn" disabled class="button -primary">Loading...</button>
+        <button type="button" data-action="start-training" disabled class="button -primary">Loading...</button>
       </header>
       
       <table class="table-content" id="vocabulary-table">
@@ -98,8 +98,11 @@
   </main>
 
   <dialog id="vocabulary-dialog">
+    <header>
+      <h2 id="dialog-title">Add vocabulary</h2>
+    </header>
+
     <form id="vocabulary-form" method="dialog">
-      <h2 id="dialog-title">Add Vocabulary</h2>
       <input type="hidden" name="id">
 
       <div class="form-group">
@@ -112,59 +115,76 @@
         <input type="text" name="back" id="back" class="form-control" placeholder="e.g. hola" required>
       </div>
 
-      <div class="dialog-actions">
+      <footer>
         <button type="button" id="dialog-cancel-btn" class="button -secondary">Cancel</button>
         <button type="button" id="dialog-save-add-btn" class="button -secondary">Save and Add</button>
         <button type="submit" id="dialog-submit-btn" class="button -primary">Save</button>
-      </div>
+      </footer>
     </form>
   </dialog>
 
-  <dialog id="training-dialog">
-    <div id="training-content">
+  <dialog data-target="training-dialog">
+    <header>
       <h2>Training</h2>
-      <p id="training-progress"></p>
-      <div id="training-card">
-        <p id="training-front" class="card-front"></p>
-        <form id="training-form">
-          <div class="form-group">
-            <input type="text" id="training-answer" class="form-control" placeholder="Type your answer..." autocomplete="off"
-              required>
-          </div>
-          <button type="submit" class="button -primary">Check</button>
-        </form>
-        <div id="training-result" hidden>
-          <p id="training-feedback"></p>
-          <p>Correct answer: <strong id="training-correct-answer"></strong></p>
-          <button type="button" id="training-next-btn" class="button -primary">Next</button>
-        </div>
+
+      <button aria-label="Close dialog" type="button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    </header>
+    
+    <div class="progress-indicator" data-target="progress-indicator">
+      <progress value="0" min="0" max="0" id="progress"></progress>
+      <label for="progress"></label>
+    </div>
+
+    <form class="training-form" data-target="form">
+      <div class="form-group">
+        <label for="answer" data-target="label"></label>
+        <input type="text" id="answer" name="answer" data-target="input" class="form-control" placeholder="Type your answer..." autocomplete="off" required autofocus>
       </div>
+
+      <button type="submit" class="button -primary">Check</button>
+    </form>
+
+    <div class="training-result" data-target="training-result" hidden>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon" data-target="icon">
+        <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden />
+        <path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden />
+      </svg>
+    
+      <p data-target="feedback"></p>
+      <p>Correct answer: <b data-target="correct-answer"></b></p>
+      <button type="button" data-target="next" class="button -primary">Next</button>
     </div>
-    <div id="training-complete" hidden>
-      <h2>Training Complete!</h2>
-      <p id="training-summary"></p>
-      <button type="button" id="training-close-btn" class="button -primary">Close</button>
-    </div>
-    <div id="training-empty" hidden>
-      <h2>No Words to Review</h2>
-      <p>There are no vocabulary words scheduled for review today.</p>
-      <button type="button" id="training-empty-close-btn" class="button -secondary">Close</button>
+
+    <div class="training-complete" data-target="training-complete" hidden>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon -neutral">
+        <path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14M17 9.24C16.605 9.725 16.065 10 15.5 10C14.935 10 14.41 9.725 14 9.24M10 9.24C9.605 9.725 9.065 10 8.5 10C7.935 10 7.41 9.725 7 9.24M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    
+      <p>Training completed!</p>
+      <p data-target="summary"></p>
+      <button type="button" data-target="close" class="button -primary">Close</button>
     </div>
   </dialog>
 
   <dialog id="language-dialog">
+    <header>
+      <h2>Add language</h2>
+    </header>
+  
     <form id="language-form" method="dialog">
-      <h2>Add Language</h2>
-      
       <div class="form-group">
         <label for="language-select" class="form-label">Select a language</label>
         <select id="language-select" class="form-control" required></select>
       </div>
 
-      <div class="dialog-actions">
+      <footer>
         <button type="button" id="language-dialog-cancel" class="button -secondary">Cancel</button>
         <button type="submit" class="button -primary">Add</button>
-      </div>
+      </footer>
     </form>
   </dialog>
 

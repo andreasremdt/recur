@@ -20,11 +20,11 @@ function openDialog(mode, row = null) {
   form.reset();
 
   if (mode === "create") {
-    dialogTitle.textContent = "Add Vocabulary";
+    dialogTitle.textContent = "Add vocabulary";
     form.elements.id.value = "";
     saveAddBtn.hidden = false;
   } else {
-    dialogTitle.textContent = "Edit Vocabulary";
+    dialogTitle.textContent = "Edit vocabulary";
     form.elements.id.value = row.dataset.id;
     form.elements.front.value = row.dataset.front;
     form.elements.back.value = row.dataset.back;

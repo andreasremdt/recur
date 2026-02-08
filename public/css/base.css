@@ -4,6 +4,120 @@
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
+    font-size: 14px;
     color: var(--color-neutral-600);
+  }
+
+  h1, h2, h3 {
+    color: var(--color-neutral-900);
+    font-weight: 600;
+  }
+
+  dialog {
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    max-inline-size: min(90vw, 28rem);
+    inline-size: 100%;
+    box-shadow:
+      0 0 0 1px var(--color-neutral-200),
+      0 20px 40px oklch(from var(--color-black) l c h / 0.15);
+
+    transition:
+      display 0.2s ease-in-out allow-discrete,
+      overlay 0.2s ease-in-out allow-discrete,
+      opacity 0.2s ease-in-out,
+      scale 0.2s ease-in-out;
+    opacity: 0;
+    scale: 0.95;
+    
+    &[open],
+    &[open]::backdrop {
+      opacity: 1;
+      scale: 1;
+    
+      @starting-style {
+        opacity: 0;
+        scale: 0.95;
+      }
+    }
+
+    &::backdrop {
+      background-color: oklch(from var(--color-neutral-950) l c h / 0.5);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.15s linear;
+      opacity: 0;
+    }
+
+    & header {
+      text-align: center;
+      margin-block-end: 1.5rem;
+      position: relative;
+
+      & h2 {
+        margin: unset;
+        font-size: 18px;
+      }
+
+      & button {
+        position: absolute;
+        inset-block-start: -12px;
+        inset-inline-end: -12px;
+        padding: unset;
+        appearance: none;;
+        background-color: transparent;
+        border: unset;
+        cursor: pointer;
+        color: var(--color-neutral-400);
+        transition: color 0.2s ease-in-out;
+        border-radius: 5px;
+
+        &:hover {
+          color: var(--color-neutral-600);
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--color-brand-600);
+          outline-offset: 2px;
+        }
+      }
+    }
+
+    & footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-block-start: 1.5rem;
+    }
+  }
+
+  progress {
+    --height: 6px;
+
+    background-color: var(--color-neutral-200);
+    border: unset;
+    appearance: none;
+    block-size: var(--height);
+    inline-size: 100%;
+    border-radius: var(--height);
+    
+    &::-webkit-progress-bar {
+      background-color: var(--color-neutral-200);
+      border-radius: var(--height);
+    }
+
+    &::-webkit-progress-value {
+      background-color: var(--color-brand-600);
+      border-radius: var(--height) 0 0 var(--height);
+    }
+
+    &::-moz-progress-bar {
+      background-color: var(--color-brand-600);
+      border-radius: var(--height) 0 0 var(--height);
+    }
+  }
+
+  [hidden] {
+    display: none !important;
   }
 }

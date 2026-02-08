@@ -29,4 +29,10 @@
   --color-brand-800: #53389e;
   --color-brand-900: #42307d;
   --color-brand-950: #2c1c5f;
+
+  --color-green-50: #edfcf2;
+  --color-green-600: #099250;
+
+  --color-red-50: #fef3f2;
+  --color-red-600: #d92d20;
 }

@@ -1,6 +1,6 @@
 import * as vocabularyTable from "./vocabulary-table.js";
 import * as vocabularyDialog from "./vocabulary-dialog.js";
-import * as training from "./training.js";
+import * as trainingDialog from "./training-dialog.js";
 import * as languageSwitcher from "./language-switcher.js";
 import fetcher from "./fetcher.js";
 
@@ -12,18 +12,18 @@ vocabularyDialog.setOnUpdate(vocabularyTable.handleUpdate);
 vocabularyTable.setOnEditClick(vocabularyDialog.openForEdit);
 
 // Wire up training callbacks
-training.setOnTrainingComplete(() => {
-  training.updateTrainingButton();
+trainingDialog.setOnTrainingComplete(() => {
+  trainingDialog.updateTrainingButton();
   vocabularyTable.loadVocabulary();
 });
-training.setOnAnswerSubmitted(vocabularyTable.updateRowAfterTraining);
+trainingDialog.setOnAnswerSubmitted(vocabularyTable.updateRowAfterTraining);
 
 // Wire up language switcher callbacks
 languageSwitcher.setOnLanguageChange((language) => {
   vocabularyTable.setCurrentLanguage(language);
-  training.setCurrentLanguage(language);
+  trainingDialog.setCurrentLanguage(language);
   vocabularyTable.loadVocabulary();
-  training.updateTrainingButton();
+  trainingDialog.updateTrainingButton();
 });
 
 // Initialize user menu
@@ -53,4 +53,4 @@ initUserMenu();
 languageSwitcher.init();
 vocabularyTable.init();
 vocabularyDialog.init();
-training.init();
+trainingDialog.init();

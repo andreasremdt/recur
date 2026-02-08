@@ -1,0 +1,210 @@
+import fetcher from "./fetcher.js";
+import { normalize, setVisibility } from "./utils.js";
+
+let startTraining = document.querySelector('[data-action="start-training"]');
+let dialog = document.querySelector('[data-target="training-dialog"]');
+
+// Training progress indicator
+let progress = dialog.querySelector('[data-target="progress-indicator"]');
+
+// Training form
+let form = dialog.querySelector('[data-target="form"]');
+let input = form.querySelector('[data-target="input"]');
+let label = dialog.querySelector('[data-target="label"]');
+
+// Training result
+let result = dialog.querySelector('[data-target="training-result"]');
+let icon = result.querySelector('[data-target="icon"]');
+let feedback = result.querySelector('[data-target="feedback"]');
+let next = result.querySelector('[data-target="next"]');
+let correctAnswer = result.querySelector('[data-target="correct-answer"]');
+
+// Training complete
+let complete = dialog.querySelector('[data-target="training-complete"]');
+let summary = complete.querySelector('[data-target="summary"]');
+let close = complete.querySelector('[data-target="close"]');
+
+const SUCCESS_MESSAGES = [
+  "Correct!",
+  "Excellent!",
+  "Well done!",
+  "You got it!",
+  "Great job!",
+];
+const FAILURE_MESSAGES = [
+  "Incorrect",
+  "Try again",
+  "Not quite",
+  "Keep practicing",
+  "Keep trying",
+];
+
+// State
+let trainingQueue = [];
+let currentIndex = 0;
+let correctCount = 0;
+let incorrectCount = 0;
+let currentLanguage = null;
+
+// Callbacks
+let onTrainingComplete = null;
+let onAnswerSubmitted = null;
+
+export function setCurrentLanguage(language) {
+  currentLanguage = language;
+}
+
+export function setOnTrainingComplete(callback) {
+  onTrainingComplete = callback;
+}
+
+export function setOnAnswerSubmitted(callback) {
+  onAnswerSubmitted = callback;
+}
+
+function getRandomMessage(messages) {
+  return messages[Math.floor(Math.random() * messages.length)];
+}
+
+function updateProgressIndidcator() {
+  let total = trainingQueue.length;
+  let percentage = Math.floor((currentIndex * 100) / total);
+
+  let [bar, label] = progress.children;
+
+  bar.max = total;
+  bar.value = currentIndex;
+  label.textContent = `${percentage}%`;
+}
+
+function showTrainingCard() {
+  const word = trainingQueue[currentIndex];
+
+  setVisibility(result, false);
+  setVisibility(form, true);
+
+  label.textContent = word.front;
+  input.value = "";
+  input.focus();
+}
+
+async function handleSubmit(event) {
+  event.preventDefault();
+
+  let word = trainingQueue[currentIndex];
+  let isCorrect = normalize(input.value) === normalize(word.back);
+  let [successPath, failurePath] = icon.children;
+
+  if (isCorrect) {
+    correctCount++;
+    feedback.textContent = getRandomMessage(SUCCESS_MESSAGES);
+    icon.classList.add("-green");
+    icon.classList.remove("-red");
+
+    setVisibility(successPath, true);
+    setVisibility(failurePath, false);
+  } else {
+    incorrectCount++;
+    feedback.textContent = getRandomMessage(FAILURE_MESSAGES);
+    icon.classList.add("-red");
+    icon.classList.remove("-green");
+
+    setVisibility(successPath, false);
+    setVisibility(failurePath, true);
+  }
+
+  correctAnswer.textContent = word.back;
+  currentIndex++;
+
+  updateProgressIndidcator();
+  setVisibility(result, true);
+  setVisibility(form, false);
+
+  next.focus();
+
+  try {
+    const updated = await fetcher.post(`/api/training/${word.id}`, {
+      correct: isCorrect,
+    });
+
+    if (onAnswerSubmitted) {
+      onAnswerSubmitted(word.id, updated.box, updated.next_review);
+    }
+  } catch (error) {
+    console.error("Failed to update vocabulary:", error);
+  }
+}
+
+function handleNextCard() {
+  if (currentIndex < trainingQueue.length) {
+    showTrainingCard();
+  } else {
+    setVisibility(result, false);
+    setVisibility(complete, true);
+
+    summary.textContent = `You got ${correctCount} out of ${trainingQueue.length} correct.`;
+  }
+}
+
+async function handleStartTraining() {
+  if (!currentLanguage) {
+    console.error("No language selected");
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams({ languageId: currentLanguage.id });
+    trainingQueue = await fetcher.get(`/api/training?${params}`);
+    currentIndex = 0;
+    correctCount = 0;
+    incorrectCount = 0;
+
+    updateProgressIndidcator();
+    showTrainingCard();
+
+    dialog.showModal();
+  } catch (error) {
+    console.error("Failed to start training:", error);
+  }
+}
+
+function handleClose() {
+  dialog.close();
+
+  if (onTrainingComplete) {
+    onTrainingComplete();
+  }
+}
+
+export async function updateTrainingButton() {
+  if (!currentLanguage) {
+    startTraining.textContent = "No language selected";
+    startTraining.disabled = true;
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams({ languageId: currentLanguage.id });
+    const scheduled = await fetcher.get(`/api/training?${params}`);
+    const count = scheduled.length;
+
+    if (count === 0) {
+      startTraining.textContent = "Nothing to repeat today";
+      startTraining.disabled = true;
+    } else {
+      startTraining.textContent = `Start Training (${count})`;
+      startTraining.disabled = false;
+    }
+  } catch (error) {
+    console.error("Failed to fetch training count:", error);
+    startTraining.textContent = "Start Training";
+    startTraining.disabled = false;
+  }
+}
+
+export function init() {
+  startTraining.addEventListener("click", handleStartTraining);
+  form.addEventListener("submit", handleSubmit);
+  next.addEventListener("click", handleNextCard);
+  close.addEventListener("click", handleClose);
+}

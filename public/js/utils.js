@@ -12,3 +12,15 @@ export function formatRelativeDate(dateString) {
 
   return relativeTimeFormatter.format(diffDays, "day");
 }
+
+export function normalize(value) {
+  return value.trim().toLowerCase();
+}
+
+export function setVisibility(element, visible) {
+  if (visible) {
+    element.removeAttribute("hidden");
+  } else {
+    element.setAttribute("hidden", "");
+  }
+}

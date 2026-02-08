@@ -6,11 +6,14 @@
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/migrate.ts && bun run src/index.ts",
     "migrate": "bun run src/migrate.ts",
-    "seed": "bun run src/seed.ts"
+    "seed": "bun run src/migrate.ts && bun run src/seed.ts",
+    "e2e": "bunx playwright test",
+    "e2e:ui": "bunx playwright test --ui"
   },
   "module": "src/index.ts",
   "private": true,
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/bun": "latest"
   },
   "peerDependencies": {

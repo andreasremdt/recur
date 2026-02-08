@@ -1,152 +1,99 @@
 import { Database } from "bun:sqlite";
 
-const db = new Database("dev.db");
+const dbPath = process.env.DB_PATH || "dev.db";
+const db = new Database(dbPath);
 
-console.log("Creating database schema...");
+// Disable foreign keys for clean deletion order
+db.run("PRAGMA foreign_keys = OFF;");
 
-// Drop tables in correct order (foreign key constraints)
-db.run("DROP TABLE IF EXISTS sessions");
-db.run("DROP TABLE IF EXISTS vocabulary");
-db.run("DROP TABLE IF EXISTS languages");
-db.run("DROP TABLE IF EXISTS users");
+db.run("DELETE FROM vocabulary");
+db.run("DELETE FROM sessions");
+db.run("DELETE FROM languages");
+db.run("DELETE FROM users");
 
-// Create users table
-db.run(`
-  CREATE TABLE users (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    last_login_at DATETIME
-  )
-`);
+db.run("PRAGMA foreign_keys = ON;");
 
-// Create sessions table
-db.run(`
-  CREATE TABLE sessions (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    expires_at DATETIME NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  )
-`);
-
-// Create languages table
-db.run(`
-  CREATE TABLE languages (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    user_id TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  )
-`);
-
-// Create vocabulary table
-db.run(`
-  CREATE TABLE vocabulary (
-    id TEXT PRIMARY KEY,
-    front TEXT NOT NULL,
-    back TEXT NOT NULL,
-    box INTEGER NOT NULL DEFAULT 1,
-    next_review DATE NOT NULL,
-    user_id TEXT,
-    language_id TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (language_id) REFERENCES languages(id) ON DELETE CASCADE
-  )
-`);
-
-console.log("Database schema created successfully.");
-
-// Helper to get date relative to today
 function getDate(daysOffset: number): string {
   const date = new Date();
   date.setDate(date.getDate() + daysOffset);
   return date.toISOString().slice(0, 10);
 }
 
-// Seed users
-const testUserId = crypto.randomUUID();
-const testUser2Id = crypto.randomUUID();
+// --- Users ---
+// John has languages and vocabulary, Jane has nothing (empty state)
+const johnId = "seed-user-john";
+const janeId = "seed-user-jane";
 
-// Hash passwords using Bun's native Argon2id
-const testPassword1 = await Bun.password.hash("password123", {
+const johnPassword = await Bun.password.hash("password123", {
   algorithm: "argon2id",
   memoryCost: 19456,
   timeCost: 2,
 });
 
-const testPassword2 = await Bun.password.hash("securepass456", {
+const janePassword = await Bun.password.hash("securepass456", {
   algorithm: "argon2id",
   memoryCost: 19456,
   timeCost: 2,
 });
 
-const insertUser = db.prepare(`
-  INSERT INTO users (id, name, email, password)
-  VALUES (?, ?, ?, ?)
-`);
+const insertUser = db.prepare(
+  "INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)",
+);
 
-insertUser.run(testUserId, "John Doe", "john@example.com", testPassword1);
-insertUser.run(testUser2Id, "Jane Smith", "jane@example.com", testPassword2);
+insertUser.run(johnId, "John Doe", "john@example.com", johnPassword);
+insertUser.run(janeId, "Jane Smith", "jane@example.com", janePassword);
 
-console.log("Seeded 2 test users.");
-console.log("  - john@example.com / password123");
-console.log("  - jane@example.com / securepass456");
+// --- Languages ---
+// Spanish has vocabulary across all boxes, French is empty
+const spanishId = "seed-lang-spanish";
+const frenchId = "seed-lang-french";
 
-// Seed languages
-const spanishLanguageId = crypto.randomUUID();
-const frenchLanguageId = crypto.randomUUID();
+const insertLanguage = db.prepare(
+  "INSERT INTO languages (id, name, user_id) VALUES (?, ?, ?)",
+);
 
-const insertLanguage = db.prepare(`
-  INSERT INTO languages (id, name, user_id)
-  VALUES (?, ?, ?)
-`);
+insertLanguage.run(spanishId, "Spanish", johnId);
+insertLanguage.run(frenchId, "French", johnId);
 
-insertLanguage.run(spanishLanguageId, "Spanish", testUserId);
-insertLanguage.run(frenchLanguageId, "French", testUserId);
-
-console.log("Seeded 2 languages for john@example.com (Spanish, French).");
-
-// Seed vocabulary (linked to first test user and Spanish language)
-const insertVocabulary = db.prepare(`
-  INSERT OR IGNORE INTO vocabulary (id, front, back, box, next_review, user_id, language_id)
-  VALUES (?, ?, ?, ?, ?, ?, ?)
-`);
+// --- Vocabulary ---
+// Covers all 5 boxes with overdue, due today, and future review dates
+const insertVocab = db.prepare(
+  "INSERT INTO vocabulary (id, front, back, box, next_review, user_id, language_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+);
 
 const vocabulary: [string, string, string, number, string, string, string][] = [
-  // Box 1 - Daily review (due today and yesterday)
-  [crypto.randomUUID(), "hello", "hola", 1, getDate(-1), testUserId, spanishLanguageId],
-  [crypto.randomUUID(), "goodbye", "adiós", 1, getDate(0), testUserId, spanishLanguageId],
-  [crypto.randomUUID(), "thank you", "gracias", 1, getDate(0), testUserId, spanishLanguageId],
+  // Box 1 — daily review
+  [crypto.randomUUID(), "hello", "hola", 1, getDate(-1), johnId, spanishId],
+  [crypto.randomUUID(), "goodbye", "adiós", 1, getDate(0), johnId, spanishId],
+  [crypto.randomUUID(), "thank you", "gracias", 1, getDate(0), johnId, spanishId],
 
-  // Box 2 - Review every 2 days
-  [crypto.randomUUID(), "please", "por favor", 2, getDate(0), testUserId, spanishLanguageId],
-  [crypto.randomUUID(), "good morning", "buenos días", 2, getDate(1), testUserId, spanishLanguageId],
+  // Box 2 — every 2 days
+  [crypto.randomUUID(), "please", "por favor", 2, getDate(0), johnId, spanishId],
+  [crypto.randomUUID(), "good morning", "buenos días", 2, getDate(1), johnId, spanishId],
 
-  // Box 3 - Review every 4 days
-  [crypto.randomUUID(), "good evening", "buenas tardes", 3, getDate(0), testUserId, spanishLanguageId],
-  [crypto.randomUUID(), "good night", "buenas noches", 3, getDate(3), testUserId, spanishLanguageId],
+  // Box 3 — every 4 days
+  [crypto.randomUUID(), "good evening", "buenas tardes", 3, getDate(0), johnId, spanishId],
+  [crypto.randomUUID(), "good night", "buenas noches", 3, getDate(3), johnId, spanishId],
 
-  // Box 4 - Review every 7 days
-  [crypto.randomUUID(), "how are you", "¿cómo estás?", 4, getDate(0), testUserId, spanishLanguageId],
-  [crypto.randomUUID(), "I'm fine", "estoy bien", 4, getDate(5), testUserId, spanishLanguageId],
+  // Box 4 — every 7 days
+  [crypto.randomUUID(), "how are you", "¿cómo estás?", 4, getDate(-2), johnId, spanishId],
+  [crypto.randomUUID(), "I'm fine", "estoy bien", 4, getDate(5), johnId, spanishId],
 
-  // Box 5 - Review every 14 days (mastered)
-  [crypto.randomUUID(), "yes", "sí", 5, getDate(0), testUserId, spanishLanguageId],
-  [crypto.randomUUID(), "no", "no", 5, getDate(10), testUserId, spanishLanguageId],
+  // Box 5 — every 14 days (mastered)
+  [crypto.randomUUID(), "yes", "sí", 5, getDate(0), johnId, spanishId],
+  [crypto.randomUUID(), "no", "no", 5, getDate(10), johnId, spanishId],
 ];
 
 for (const word of vocabulary) {
-  insertVocabulary.run(word[0], word[1], word[2], word[3], word[4], word[5], word[6]);
+  insertVocab.run(...word);
 }
 
-console.log(`Seeded ${vocabulary.length} vocabulary entries for john@example.com.`);
-
 db.close();
+
+console.log("Database seeded successfully.");
+console.log("  Users:");
+console.log("    - john@example.com / password123 (2 languages, 11 vocabulary)");
+console.log("    - jane@example.com / securepass456 (no data)");
+console.log("  Languages (John):");
+console.log("    - Spanish (11 vocabulary across boxes 1-5)");
+console.log("    - French (empty)");

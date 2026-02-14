@@ -120,4 +120,27 @@
   [hidden] {
     display: none !important;
   }
+
+  [popover] {
+    margin: unset;
+    padding: unset;
+    border: unset;
+    transition:
+      display 0.2s ease-in-out allow-discrete,
+      overlay 0.2s ease-in-out allow-discrete,
+      opacity 0.2s ease-in-out,
+      scale 0.2s ease-in-out;
+    opacity: 0;
+    scale: 0.95;
+    
+    &:popover-open {
+      opacity: 1;
+      scale: 1;
+    
+      @starting-style {
+        opacity: 0;
+        scale: 0.95;
+      }
+    }
+  }
 }

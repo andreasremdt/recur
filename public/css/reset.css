@@ -1,5 +1,4 @@
 @layer reset {
-
   *,
   *::before,
   *::after {
@@ -44,8 +43,17 @@
     font-size: inherit;
   }
 
-  button>svg {
-    pointer-events: none;
+  button {
+    appearance: none;
+    background-color: unset;
+    padding: unset;
+    margin: unset;
+    border: none;
+    cursor: pointer;
+
+    & svg {
+      pointer-events: none;
+    }
   }
 
   :target {

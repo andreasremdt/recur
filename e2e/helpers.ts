@@ -10,5 +10,7 @@ export async function login(
   await page.fill('input[name="password"]', password);
   await page.click('button[type="submit"]');
   await page.waitForURL("/");
-  await expect(page.locator("#user-name")).toBeVisible();
+  await page.click('[data-testid="user-menu"]');
+  await expect(page.locator('[data-target="user-name"]')).toBeVisible();
+  await page.click('[data-testid="user-menu"]');
 }

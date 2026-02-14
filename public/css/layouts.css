@@ -9,22 +9,49 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.5rem;
-    padding-block: 1rem;
+    padding-block: 1.5rem;
+
+    & .avatar {
+      --size: 36px;
+
+      inline-size: var(--size);
+      aspect-ratio: 1;
+      background-color: var(--color-neutral-100);
+      color: var(--color-neutral-600);
+      appearance: none;
+      padding: unset;
+      border: unset;
+      margin: unset;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      border-radius: var(--size);
+      transition: background-color .15s ease-in-out;
+      anchor-name: --user-menu;
+
+      &:hover {
+        background-color: var(--color-neutral-200);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-brand-500);
+        outline-offset: 2px;
+      }
+    }
   }
 
-  .app-header h1 {
-    margin: 0;
-  }
-
-  .user-menu {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+  .user-header {
+    padding: 0.25rem 1rem;
   }
 
   .user-name {
-    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-neutral-900);
+    margin: unset;
+  }
+
+  .user-email {
+    margin: unset;
     color: var(--color-neutral-600);
   }
 

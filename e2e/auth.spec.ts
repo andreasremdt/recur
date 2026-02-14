@@ -20,7 +20,10 @@ test.describe("Registration", () => {
     await page.click('button[type="submit"]');
 
     await expect(page).toHaveURL("/");
-    await expect(page.locator("#user-name")).toHaveText("New User");
+    await page.click('[data-testid="user-menu"]');
+    await expect(page.locator('[data-target="user-name"]')).toHaveText(
+      "New User",
+    );
   });
 
   test("shows error when passwords do not match", async ({ page }) => {
@@ -67,7 +70,10 @@ test.describe("Login", () => {
     await page.click('button[type="submit"]');
 
     await expect(page).toHaveURL("/");
-    await expect(page.locator("#user-name")).toHaveText("John Doe");
+    await page.click('[data-testid="user-menu"]');
+    await expect(page.locator('[data-target="user-name"]')).toHaveText(
+      "John Doe",
+    );
   });
 
   test("shows error with invalid credentials", async ({ page }) => {
@@ -106,7 +112,8 @@ test.describe("Logout", () => {
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL("/");
 
-    await page.click("#logout-btn");
+    await page.click('[data-testid="user-menu"]');
+    await page.click('[data-action="logout"]');
 
     await expect(page).toHaveURL(/login\.html/);
   });

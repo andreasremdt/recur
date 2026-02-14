@@ -6,6 +6,7 @@ let title = dialog.querySelector("[data-target='title']");
 
 let form = dialog.querySelector("[data-target='vocabulary-form']");
 let saveAddBtn = dialog.querySelector("[data-action='save-and-add']");
+let closeButtons = dialog.querySelectorAll("[data-action='close-dialog']");
 
 let onCreate = null;
 let onUpdate = null;
@@ -37,10 +38,6 @@ function openDialog(mode, row = null) {
 }
 
 function handleSubmit(event) {
-  if (event.submitter.value === "cancel") {
-    return;
-  }
-
   let id = form.elements.id.value;
   let front = form.elements.front.value;
   let back = form.elements.back.value;
@@ -71,7 +68,14 @@ export function openForEdit(row) {
   openDialog("edit", row);
 }
 
+function handleCloseDialog() {
+  dialog.close();
+}
+
 export function init() {
   add.addEventListener("click", openForCreate);
   form.addEventListener("submit", handleSubmit);
+  closeButtons.forEach((btn) =>
+    btn.addEventListener("click", handleCloseDialog),
+  );
 }

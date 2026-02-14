@@ -131,7 +131,7 @@
       <header>
         <h2 data-target="title">Add vocabulary</h2>
 
-        <button aria-label="Close dialog" type="submit" form="vocabulary-form" formnovalidate value="cancel">
+        <button aria-label="Close dialog" type="button" data-action="close-dialog">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
@@ -152,7 +152,7 @@
         </div>
 
         <footer>
-          <button type="submit" formnovalidate value="cancel" class="button -secondary" data-testid="cancel-button">Cancel</button>
+          <button type="button" class="button -secondary" data-testid="cancel-button" data-action="close-dialog">Close</button>
           <button type="submit" value="save-and-add" data-action="save-and-add" class="button -secondary">Save and add</button>
           <button type="submit" value="save" class="button -primary" data-testid="save-button">Save</button>
         </footer>
@@ -163,7 +163,7 @@
       <header>
         <h2>Training</h2>
 
-        <button aria-label="Close dialog" type="submit" form="training-form" formnovalidate value="cancel">
+        <button aria-label="Close dialog" type="button" data-action="close-dialog">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>

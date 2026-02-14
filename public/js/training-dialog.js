@@ -10,6 +10,7 @@ let progress = dialog.querySelector('[data-target="progress-indicator"]');
 // Training form
 let form = dialog.querySelector('[data-target="training-form"]');
 let label = dialog.querySelector('[data-target="label"]');
+let closeDialog = dialog.querySelector('[data-action="close-dialog"]');
 
 // Training result
 let result = dialog.querySelector('[data-target="training-result"]');
@@ -88,10 +89,6 @@ function showTrainingCard() {
 }
 
 async function handleSubmit(event) {
-  if (event.submitter.value === "cancel") {
-    return;
-  }
-
   event.preventDefault();
 
   let word = trainingQueue[currentIndex];
@@ -212,4 +209,5 @@ export function init() {
   form.addEventListener("submit", handleSubmit);
   next.addEventListener("click", handleNextCard);
   close.addEventListener("click", handleClose);
+  closeDialog.addEventListener("click", handleClose);
 }

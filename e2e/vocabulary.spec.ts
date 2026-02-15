@@ -8,12 +8,7 @@ test.beforeEach(async ({ page }) => {
   });
 
   await login(page);
-
-  // Wait for the app to fully initialize, then switch to Spanish
   await expect(page.getByText(/\d+ words/)).toBeVisible();
-  await page.getByRole("button", { name: /open your languages/i }).click();
-  await page.getByRole("button", { name: /spanish/i }).click();
-  await expect(page.getByRole("table").locator("tbody tr")).toHaveCount(11);
 });
 
 test("adds new vocabulary", async ({ page }) => {

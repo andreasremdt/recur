@@ -22,14 +22,21 @@ trainingDialog.setOnAnswerSubmitted(vocabularyTable.updateRowAfterTraining);
 // Wire up language switcher callbacks
 languageSwitcher.setOnLanguageChange((language) => {
   vocabularyTable.setCurrentLanguage(language);
-  trainingDialog.setCurrentLanguage(language);
   vocabularyTable.loadVocabulary();
+
+  trainingDialog.setCurrentLanguage(language);
   trainingDialog.updateTrainingButton();
 });
 
 // Wire up language dialog callbacks
 languageDialog.setOnLanguageCreate((language) => {
   languageSwitcher.addLanguage(language);
+  vocabularyTable.setCurrentLanguage(language);
+
+  vocabularyTable.loadVocabulary();
+
+  trainingDialog.setCurrentLanguage(language);
+  trainingDialog.updateTrainingButton();
 });
 
 // Initialize all modules

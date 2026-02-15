@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("creates a new language and selects it", async ({ page }) => {
-  let vocabularyTable = page.getByRole("table");
+  let table = page.getByRole("table");
 
   await page.getByRole("button", { name: /open your languages/i }).click();
   await page.getByRole("button", { name: /add language/i }).click();
@@ -31,36 +31,41 @@ test("creates a new language and selects it", async ({ page }) => {
 
   // German is now selected and has no vocabulary
   await expect(page.getByText(/0 words/i)).toBeVisible();
-  await expect(vocabularyTable.locator("tbody tr")).toHaveCount(0);
+  await expect(table.locator("tbody tr")).toHaveCount(0);
 });
 
 test("switches between languages and loads corresponding vocabulary", async ({
   page,
 }) => {
-  let vocabularyTable = page.getByRole("table");
+  let table = page.getByRole("table");
 
-  // French is auto-selected (alphabetically first) with no vocabulary
-  await expect(page.getByText(/0 words/)).toBeVisible();
-  await expect(vocabularyTable.locator("tbody tr")).toHaveCount(0);
-
-  // Switch to Spanish — has 11 seeded words
-  await page.getByRole("button", { name: /open your languages/i }).click();
-  await page.getByRole("button", { name: /spanish/i }).click();
-  await expect(vocabularyTable.locator("tbody tr")).toHaveCount(11);
+  // Spanish is auto-selected and has 11 seeded words
+  await expect(table.locator("tbody tr")).toHaveCount(11);
   await expect(page.getByText(/11 words/i)).toBeVisible();
 
-  // Switch back to French — empty again
+  // Switch to French — has no vocabulary
   await page.getByRole("button", { name: /open your languages/i }).click();
   await page.getByRole("button", { name: /french/i }).click();
-  await expect(vocabularyTable.locator("tbody tr")).toHaveCount(0);
-  await expect(page.getByText(/0 words/)).toBeVisible();
+
+  await expect(page.getByText(/0 words/i)).toBeVisible();
+  await expect(table.locator("tbody tr")).toHaveCount(0);
+
+  // Switch back to Spanish — has 11 seeded words again
+  await page.getByRole("button", { name: /open your languages/i }).click();
+  await page.getByRole("button", { name: /spanish/i }).click();
+
+  await expect(table.locator("tbody tr")).toHaveCount(11);
+  await expect(page.getByText(/11 words/i)).toBeVisible();
 });
 
 test("shows empty state when language has no vocabulary", async ({ page }) => {
-  let vocabularyTable = page.getByRole("table");
+  let table = page.getByRole("table");
 
-  // French is auto-selected and has no vocabulary
-  await expect(vocabularyTable.locator("tbody tr")).toHaveCount(0);
+  // Switch to French — has no vocabulary
+  await page.getByRole("button", { name: /open your languages/i }).click();
+  await page.getByRole("button", { name: /french/i }).click();
+
+  await expect(table.locator("tbody tr")).toHaveCount(0);
   await expect(page.getByText(/0 words/i)).toBeVisible();
   await expect(page.locator("#pagination-range")).toHaveText("0");
   await expect(page.locator("#pagination-total")).toHaveText("0");
@@ -113,5 +118,5 @@ test("cancels the language dialog without creating", async ({ page }) => {
     .getByRole("button")
     .allTextContents();
 
-  expect(languageOptions.map((s) => s.trim())).toEqual(["French", "Spanish"]);
+  expect(languageOptions.map((s) => s.trim())).toEqual(["Spanish", "French"]);
 });

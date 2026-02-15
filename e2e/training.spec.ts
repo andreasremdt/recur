@@ -29,32 +29,24 @@ test("shows correct count of due items on the training button", async ({
     name: /start training|nothing to repeat today/i,
   });
 
-  // French is auto-selected — has no vocabulary at all
-  await expect(trainingButton).toHaveText(/nothing to repeat today/i);
-  await expect(trainingButton).toBeDisabled();
-
-  // Switch to Spanish — 7 items are due (overdue + due today)
-  await page.getByRole("button", { name: /open your languages/i }).click();
-  await page.getByRole("button", { name: /spanish/i }).click();
+  // Spanish is auto-selected - 7 items are due (overdue + due today)
   await expect(trainingButton).toHaveText(/start training \(7\)/i);
   await expect(trainingButton).toBeEnabled();
+
+  // Switch to French - has no vocabulary at all
+  await page.getByRole("button", { name: /open your languages/i }).click();
+  await page.getByRole("button", { name: /french/i }).click();
+
+  await expect(trainingButton).toHaveText(/nothing to repeat today/i);
+  await expect(trainingButton).toBeDisabled();
 });
 
 test("answers a question correctly and shows positive feedback", async ({
   page,
 }) => {
-  await page.getByRole("button", { name: /open your languages/i }).click();
-  await page.getByRole("button", { name: /spanish/i }).click();
-
-  await expect(
-    page.getByRole("button", {
-      name: /start training|nothing to repeat today/i,
-    }),
-  ).toBeEnabled();
+  await page.getByRole("button", { name: /start training/i }).click();
 
   let dialog = page.getByRole("dialog", { name: /training/i });
-
-  await page.getByRole("button", { name: /start training/i }).click();
 
   await expect(dialog).toBeVisible();
 
@@ -73,17 +65,9 @@ test("answers a question correctly and shows positive feedback", async ({
 test("answers a question incorrectly and shows the correct answer", async ({
   page,
 }) => {
-  await page.getByRole("button", { name: /open your languages/i }).click();
-  await page.getByRole("button", { name: /spanish/i }).click();
-  await expect(
-    page.getByRole("button", {
-      name: /start training|nothing to repeat today/i,
-    }),
-  ).toBeEnabled();
+  await page.getByRole("button", { name: /start training/i }).click();
 
   let dialog = page.getByRole("dialog", { name: /training/i });
-
-  await page.getByRole("button", { name: /start training/i }).click();
 
   await expect(dialog).toBeVisible();
 
@@ -104,14 +88,10 @@ test("answers a question incorrectly and shows the correct answer", async ({
 test("completes a full training session and shows summary", async ({
   page,
 }) => {
-  await page.getByRole("button", { name: /open your languages/i }).click();
-  await page.getByRole("button", { name: /spanish/i }).click();
-  await expect(
-    page.getByRole("button", { name: /start training/i }),
-  ).toHaveText(/start training \(7\)/i);
+  await page.getByRole("button", { name: /start training/i }).click();
 
   let dialog = page.getByRole("dialog", { name: /training/i });
-  await page.getByRole("button", { name: /start training/i }).click();
+
   await expect(dialog).toBeVisible();
 
   let answerInput = dialog.getByPlaceholder(/type your answer/i);
@@ -149,18 +129,9 @@ test("completes a full training session and shows summary", async ({
 test("updates the training button after completing a session", async ({
   page,
 }) => {
-  let trainingButton = page.getByRole("button", {
-    name: /start training|nothing to repeat today/i,
-  });
-
-  await page.getByRole("button", { name: /open your languages/i }).click();
-  await page.getByRole("button", { name: /spanish/i }).click();
-
-  await expect(trainingButton).toHaveText(/start training \(7\)/i);
+  await page.getByRole("button", { name: /start training/i }).click();
 
   let dialog = page.getByRole("dialog", { name: /training/i });
-
-  await page.getByRole("button", { name: /start training/i }).click();
 
   await expect(dialog).toBeVisible();
 
@@ -181,13 +152,14 @@ test("updates the training button after completing a session", async ({
 
   await dialog.getByRole("button", { name: /close/i }).last().click();
 
-  await expect(trainingButton).toHaveText(/nothing to repeat today/i);
-  await expect(trainingButton).toBeDisabled();
+  await expect(
+    page.getByRole("button", {
+      name: /nothing to repeat today/i,
+    }),
+  ).toBeDisabled();
 });
 
 test("shows progress during training", async ({ page }) => {
-  await page.getByRole("button", { name: /open your languages/i }).click();
-  await page.getByRole("button", { name: /spanish/i }).click();
   await page.getByRole("button", { name: /start training/i }).click();
 
   let dialog = page.getByRole("dialog", { name: /training/i });

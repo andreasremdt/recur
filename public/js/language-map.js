@@ -4,7 +4,7 @@ const LANGUAGE_MAP = {
   es: "Spanish",
   en: "English",
   it: "Italian",
-  ja: "Japanese",
+  jp: "Japanese",
   ko: "Korean",
   pl: "Polish",
   pt: "Portuguese",

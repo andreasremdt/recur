@@ -17,13 +17,13 @@
     block-size: 2.25rem;
     transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 
-    & svg {
-      opacity: 0.5;
-    }
-
     &:focus-visible {
       outline: 2px solid var(--color-brand-500);
       outline-offset: 2px;
+    }
+
+    & svg {
+      color: var(--icon-color);
     }
 
     &[disabled] {
@@ -34,6 +34,7 @@
       --text-color: var(--color-white);
       --background-color: var(--color-brand-600);
       --border-color: var(--color-brand-700);
+      --icon-color: var(--color-brand-200);
 
       &:hover {
         --background-color: var(--color-brand-700);
@@ -44,6 +45,7 @@
         --background-color: var(--color-neutral-100);
         --border-color: var(--color-neutral-200);
         --text-color: var(--color-neutral-500);
+        --icon-color: var(--color-neutral-300);
       }
     }
 
@@ -51,7 +53,8 @@
       --text-color: var(--color-neutral-800);
       --background-color: var(--color-white);
       --border-color: var(--color-neutral-300);
-
+      --icon-color: var(--color-neutral-400);
+      
       &:hover {
         --background-color: var(--color-neutral-50);
         --border-color: var(--color-neutral-400);
@@ -61,7 +64,27 @@
         --background-color: var(--color-white);
         --border-color: var(--color-neutral-200);
         --text-color: var(--color-neutral-400);
+        --icon-color: var(--color-neutral-300);
       }
+    }
+  }
+
+  .button-group {
+    display: flex;
+    align-items: center;
+
+    & button:first-child {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    & button:last-child {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    & button:not(:last-child) {
+      margin-inline-end: -1px;
     }
   }
 }

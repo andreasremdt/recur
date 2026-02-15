@@ -161,7 +161,6 @@
 
     & .form-control {
       inline-size: 75px;
-      margin-inline-end: 1.5rem;
     }
   }
 }

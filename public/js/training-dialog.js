@@ -94,24 +94,19 @@ async function handleSubmit(event) {
   let word = trainingQueue[currentIndex];
   let isCorrect =
     normalize(form.elements.answer.value) === normalize(word.back);
-  let [successPath, failurePath] = icon.children;
 
   if (isCorrect) {
     correctCount++;
     feedback.textContent = getRandomMessage(SUCCESS_MESSAGES);
     icon.classList.add("-green");
     icon.classList.remove("-red");
-
-    setVisibility(successPath, true);
-    setVisibility(failurePath, false);
+    icon.firstElementChild.setAttribute("href", "/icons/icon-defs.svg#check");
   } else {
     incorrectCount++;
     feedback.textContent = getRandomMessage(FAILURE_MESSAGES);
     icon.classList.add("-red");
     icon.classList.remove("-green");
-
-    setVisibility(successPath, false);
-    setVisibility(failurePath, true);
+    icon.firstElementChild.setAttribute("href", "/icons/icon-defs.svg#cross");
   }
 
   correctAnswer.textContent = word.back;

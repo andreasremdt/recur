@@ -52,8 +52,8 @@ const insertLanguage = db.prepare(
   "INSERT INTO languages (id, name, user_id) VALUES (?, ?, ?)",
 );
 
-insertLanguage.run(spanishId, "Spanish", johnId);
-insertLanguage.run(frenchId, "French", johnId);
+insertLanguage.run(spanishId, "es", johnId);
+insertLanguage.run(frenchId, "fr", johnId);
 
 // --- Vocabulary ---
 // Covers all 5 boxes with overdue, due today, and future review dates
@@ -65,19 +65,75 @@ const vocabulary: [string, string, string, number, string, string, string][] = [
   // Box 1 — daily review
   [crypto.randomUUID(), "hello", "hola", 1, getDate(-1), johnId, spanishId],
   [crypto.randomUUID(), "goodbye", "adiós", 1, getDate(0), johnId, spanishId],
-  [crypto.randomUUID(), "thank you", "gracias", 1, getDate(0), johnId, spanishId],
+  [
+    crypto.randomUUID(),
+    "thank you",
+    "gracias",
+    1,
+    getDate(0),
+    johnId,
+    spanishId,
+  ],
 
   // Box 2 — every 2 days
-  [crypto.randomUUID(), "please", "por favor", 2, getDate(0), johnId, spanishId],
-  [crypto.randomUUID(), "good morning", "buenos días", 2, getDate(1), johnId, spanishId],
+  [
+    crypto.randomUUID(),
+    "please",
+    "por favor",
+    2,
+    getDate(0),
+    johnId,
+    spanishId,
+  ],
+  [
+    crypto.randomUUID(),
+    "good morning",
+    "buenos días",
+    2,
+    getDate(1),
+    johnId,
+    spanishId,
+  ],
 
   // Box 3 — every 4 days
-  [crypto.randomUUID(), "good evening", "buenas tardes", 3, getDate(0), johnId, spanishId],
-  [crypto.randomUUID(), "good night", "buenas noches", 3, getDate(3), johnId, spanishId],
+  [
+    crypto.randomUUID(),
+    "good evening",
+    "buenas tardes",
+    3,
+    getDate(0),
+    johnId,
+    spanishId,
+  ],
+  [
+    crypto.randomUUID(),
+    "good night",
+    "buenas noches",
+    3,
+    getDate(3),
+    johnId,
+    spanishId,
+  ],
 
   // Box 4 — every 7 days
-  [crypto.randomUUID(), "how are you", "¿cómo estás?", 4, getDate(-2), johnId, spanishId],
-  [crypto.randomUUID(), "I'm fine", "estoy bien", 4, getDate(5), johnId, spanishId],
+  [
+    crypto.randomUUID(),
+    "how are you",
+    "¿cómo estás?",
+    4,
+    getDate(-2),
+    johnId,
+    spanishId,
+  ],
+  [
+    crypto.randomUUID(),
+    "I'm fine",
+    "estoy bien",
+    4,
+    getDate(5),
+    johnId,
+    spanishId,
+  ],
 
   // Box 5 — every 14 days (mastered)
   [crypto.randomUUID(), "yes", "sí", 5, getDate(0), johnId, spanishId],
@@ -92,7 +148,9 @@ db.close();
 
 console.log("Database seeded successfully.");
 console.log("  Users:");
-console.log("    - john@example.com / password123 (2 languages, 11 vocabulary)");
+console.log(
+  "    - john@example.com / password123 (2 languages, 11 vocabulary)",
+);
 console.log("    - jane@example.com / securepass456 (no data)");
 console.log("  Languages (John):");
 console.log("    - Spanish (11 vocabulary across boxes 1-5)");

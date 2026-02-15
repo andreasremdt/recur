@@ -1,12 +1,10 @@
 import { setVisibility } from "./utils.js";
 
-let add = document.querySelector("[data-action='add']");
 let dialog = document.querySelector("[data-target='vocabulary-dialog']");
 let title = dialog.querySelector("[data-target='title']");
 
 let form = dialog.querySelector("[data-target='vocabulary-form']");
 let saveAddBtn = dialog.querySelector("[data-action='save-and-add']");
-let closeButtons = dialog.querySelectorAll("[data-action='close-dialog']");
 
 let onCreate = null;
 let onUpdate = null;
@@ -41,18 +39,20 @@ function handleSubmit(event) {
   let id = form.elements.id.value;
   let front = form.elements.front.value;
   let back = form.elements.back.value;
-
+  console.log("SUBMIT");
   if (id) {
     if (onUpdate) {
       onUpdate(id, front, back);
     }
   } else {
     if (onCreate) {
+      console.log("onCreate", front, back);
       onCreate(front, back);
     }
   }
 
   if (event.submitter.value === "save-and-add") {
+    console.log("save-and-add");
     event.preventDefault();
 
     form.reset();
@@ -60,22 +60,13 @@ function handleSubmit(event) {
   }
 }
 
-export function openForCreate() {
-  openDialog("create");
-}
-
-export function openForEdit(row) {
-  openDialog("edit", row);
-}
-
-function handleCloseDialog() {
-  dialog.close();
+function handleOpen(event) {
+  if (event.newState === "open" && event.source) {
+    openDialog(event.source.value, event.source.closest("tr"));
+  }
 }
 
 export function init() {
-  add.addEventListener("click", openForCreate);
   form.addEventListener("submit", handleSubmit);
-  closeButtons.forEach((btn) =>
-    btn.addEventListener("click", handleCloseDialog),
-  );
+  dialog.addEventListener("toggle", handleOpen);
 }

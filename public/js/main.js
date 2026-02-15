@@ -9,9 +9,6 @@ import * as userMenu from "./user-menu.js";
 vocabularyDialog.setOnCreate(vocabularyTable.handleCreate);
 vocabularyDialog.setOnUpdate(vocabularyTable.handleUpdate);
 
-// Wire up table callbacks
-vocabularyTable.setOnEditClick(vocabularyDialog.openForEdit);
-
 // Wire up training callbacks
 trainingDialog.setOnTrainingComplete(() => {
   trainingDialog.updateTrainingButton();

@@ -24,15 +24,8 @@ let currentPagination = loadPagination();
 let allVocabulary = []; // All vocabulary items fetched from server
 let currentLanguage = null;
 
-// Callbacks
-let onEditClick = null;
-
 export function setCurrentLanguage(language) {
   currentLanguage = language;
-}
-
-export function setOnEditClick(callback) {
-  onEditClick = callback;
 }
 
 function createRow(word) {
@@ -51,7 +44,7 @@ function createRow(word) {
     <td>${formatRelativeDate(word.next_review)}</td>
     <td>
       <div class="actions">
-        <button type="button" class="edit-btn" title="Edit">
+        <button type="button" class="edit-btn" title="Edit" commandfor="vocabulary-dialog" command="show-modal" value="edit">
           <svg width="16" height="16">
             <use href="/icons/icon-defs.svg#pencil" />
           </svg>
@@ -379,11 +372,7 @@ export function init() {
 
     if (!row) return;
 
-    if (target.classList.contains("edit-btn")) {
-      if (onEditClick) {
-        onEditClick(row);
-      }
-    } else if (target.classList.contains("delete-btn")) {
+    if (target.classList.contains("delete-btn")) {
       handleDelete(row);
     }
   });

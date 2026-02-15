@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { execSync } from "node:child_process";
-import { login } from "./helpers";
+import { login, waitFor } from "./helpers";
 
 // Lookup table: English prompt → Spanish answer (for the 7 due items)
 let ANSWERS: Record<string, string> = {
@@ -49,6 +49,7 @@ test("answers a question correctly and shows positive feedback", async ({
   let dialog = page.getByRole("dialog", { name: /training/i });
 
   await expect(dialog).toBeVisible();
+  await waitFor(200);
 
   // Read the prompt and provide the correct answer
   let prompt = await dialog.locator('[data-target="label"]').textContent();
@@ -70,6 +71,7 @@ test("answers a question incorrectly and shows the correct answer", async ({
   let dialog = page.getByRole("dialog", { name: /training/i });
 
   await expect(dialog).toBeVisible();
+  await waitFor(200);
 
   let prompt = await dialog.locator('[data-target="label"]').textContent();
   let correctAnswer = ANSWERS[prompt!.trim()];
@@ -93,6 +95,7 @@ test("completes a full training session and shows summary", async ({
   let dialog = page.getByRole("dialog", { name: /training/i });
 
   await expect(dialog).toBeVisible();
+  await waitFor(200);
 
   let answerInput = dialog.getByPlaceholder(/type your answer/i);
 
@@ -134,6 +137,7 @@ test("updates the training button after completing a session", async ({
   let dialog = page.getByRole("dialog", { name: /training/i });
 
   await expect(dialog).toBeVisible();
+  await waitFor(200);
 
   let input = dialog.getByPlaceholder(/type your answer/i);
 
@@ -165,6 +169,7 @@ test("shows progress during training", async ({ page }) => {
   let dialog = page.getByRole("dialog", { name: /training/i });
 
   await expect(dialog).toBeVisible();
+  await waitFor(200);
 
   let progressbar = dialog.getByRole("progressbar");
 

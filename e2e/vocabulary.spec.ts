@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { execSync } from "node:child_process";
-import { login } from "./helpers";
+import { login, waitFor } from "./helpers";
 
 test.beforeEach(async ({ page }) => {
   execSync("bun run src/seed.ts", {
@@ -18,6 +18,8 @@ test("adds new vocabulary", async ({ page }) => {
   await page.getByRole("button", { name: /add$/i }).click();
 
   await expect(dialog).toBeVisible();
+  await waitFor(200);
+
   await expect(dialog.getByRole("heading")).toHaveText("Add vocabulary");
 
   await dialog.getByLabel(/in your language/i).fill("water");
@@ -38,6 +40,9 @@ test("adds multiple vocabulary entries with 'Save and Add'", async ({
   let dialog = page.getByRole("dialog", { name: /add vocabulary/i });
 
   await page.getByRole("button", { name: /add$/i }).click();
+
+  await expect(dialog).toBeVisible();
+  await waitFor(200);
 
   // First word — click "Save and Add"
   await dialog.getByLabel(/in your language/i).fill("water");

@@ -1,7 +1,7 @@
 import fetcher from "./fetcher.js";
 import { normalize, setVisibility } from "./utils.js";
 
-let startTraining = document.querySelector('[data-action="start-training"]');
+let startTraining = document.querySelector('[data-target="start-training"]');
 let dialog = document.querySelector('[data-target="training-dialog"]');
 
 // Training progress indicator
@@ -10,7 +10,6 @@ let progress = dialog.querySelector('[data-target="progress-indicator"]');
 // Training form
 let form = dialog.querySelector('[data-target="training-form"]');
 let label = dialog.querySelector('[data-target="label"]');
-let closeDialog = dialog.querySelector('[data-action="close-dialog"]');
 
 // Training result
 let result = dialog.querySelector('[data-target="training-result"]');
@@ -22,7 +21,6 @@ let correctAnswer = result.querySelector('[data-target="correct-answer"]');
 // Training complete
 let complete = dialog.querySelector('[data-target="training-complete"]');
 let summary = complete.querySelector('[data-target="summary"]');
-let close = complete.querySelector('[data-target="close"]');
 
 const SUCCESS_MESSAGES = [
   "Correct!",
@@ -142,7 +140,11 @@ function handleNextCard() {
   }
 }
 
-async function handleStartTraining() {
+async function handleStartTraining(event) {
+  if (event.newState === "closed") {
+    return;
+  }
+
   if (!currentLanguage) {
     console.error("No language selected");
     return;
@@ -200,9 +202,8 @@ export async function updateTrainingButton() {
 }
 
 export function init() {
-  startTraining.addEventListener("click", handleStartTraining);
   form.addEventListener("submit", handleSubmit);
   next.addEventListener("click", handleNextCard);
-  close.addEventListener("click", handleClose);
-  closeDialog.addEventListener("click", handleClose);
+  dialog.addEventListener("close", handleClose);
+  dialog.addEventListener("toggle", handleStartTraining);
 }

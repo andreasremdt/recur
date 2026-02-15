@@ -1,11 +1,7 @@
 import LANGUAGE_MAP from "../language-map.js";
 import fetcher from "../fetcher.js";
 
-// Elements
-let openButtons = document.querySelectorAll('[data-action="add-language"]');
-
 let dialog = document.querySelector('[data-target="language-dialog"]');
-let closeButtons = dialog.querySelectorAll("[data-action='close-dialog']");
 let form = dialog.querySelector('[data-target="language-form"]');
 let select = dialog.querySelector('[data-target="language-select"]');
 
@@ -16,7 +12,7 @@ export function setOnLanguageCreate(callback) {
   onLanguageCreate = callback;
 }
 
-function renderOptions() {
+function handleOpen() {
   select.innerHTML = "";
 
   for (let [key, name] of Object.entries(LANGUAGE_MAP)) {
@@ -51,15 +47,5 @@ async function handleSubmit(event) {
 
 export function init() {
   form.addEventListener("submit", handleSubmit);
-
-  openButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      renderOptions();
-      dialog.showModal();
-    });
-  });
-
-  closeButtons.forEach((button) => {
-    button.addEventListener("click", () => dialog.close());
-  });
+  dialog.addEventListener("toggle", handleOpen);
 }

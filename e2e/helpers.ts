@@ -22,3 +22,7 @@ export async function login(
   // Close the user menu so that it doesn't interfere with other tests by overlapping with other elements
   await page.getByRole("button", { name: /open user menu/i }).click();
 }
+
+export async function waitFor(ms: number) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}

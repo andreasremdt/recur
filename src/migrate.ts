@@ -71,6 +71,11 @@ db.run(`
 `);
 console.log("[migrate] ✓ vocabulary table ready");
 
+db.run(`
+  UPDATE languages SET name = 'es' WHERE name = 'Spanish';
+  UPDATE languages SET name = 'fr' WHERE name = 'French';
+`);
+
 db.close();
 
 console.log("[migrate] Database migration complete!");

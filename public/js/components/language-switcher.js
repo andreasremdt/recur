@@ -46,19 +46,13 @@ function renderLanguageDropdown() {
     setVisibility(dropdownTrigger, true);
 
     if (currentLanguage) {
-      languageFlag.setAttribute(
-        "href",
-        `/icons/country-defs.svg#${currentLanguage.name}`,
-      );
+      languageFlag.src = `/icons/flags/${currentLanguage.name}.svg`;
     }
 
     let options = languages.map((language) => {
       return `
         <button type="button" class="item${language.id === currentLanguage.id ? " -active" : ""}" data-language-id="${language.id}" data-action="switch-langage">
-          <svg width="20" height="20">
-            <use href="/icons/country-defs.svg#${language.name}" />
-          </svg>
-
+          <img src="/icons/flags/${language.name}.svg" width="20" height="20" alt="" />  
           ${LANGUAGE_MAP[language.name] ?? language.name}
         </button>`;
     });

@@ -49,7 +49,7 @@
       padding: 0.25rem;
       anchor-name: --language-switcher;
 
-      & svg {
+      & img {
         inline-size: 100%;
         block-size: 100%;
       }

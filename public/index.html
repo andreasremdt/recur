@@ -33,12 +33,31 @@
   <body>
     <main class="container">
       <header class="app-header">
-        <img src="/icons/logo.svg" alt="Recur" width="32" height="32">
+        <img src="/icons/logo.svg" alt="Recur" width="32" height="32" class="logo">
         
-        <div id="language-switcher" class="language-switcher">
-          <select id="language-dropdown" class="form-control">
-            <option id="add-language-option" value="add-new">+ Add language</option>
-          </select>
+        <button type="button" class="button -secondary" data-action="add-language" hidden>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Add
+        </button>
+
+        <button type="button" data-target="language-dropdown-trigger" popovertarget="language-menu" class="language-trigger" hidden aria-label="Open your languages">
+          <svg width="36" height="36">
+            <use href="" data-target="language-flag" />
+          </svg>
+        </button>
+
+        <div id="language-menu" popover class="dropdown" data-target="language-menu">
+          <div data-target="language-list"></div>
+          <hr class="separator" />
+          <button type="button" class="item" data-action="add-language">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+
+            Add language
+          </button>
         </div>
 
         <button type="button" aria-label="Open user menu" popovertarget="user-menu" class="avatar" data-testid="user-menu">
@@ -127,9 +146,9 @@
         </div>
     </main>
 
-    <dialog data-target="vocabulary-dialog">
+    <dialog data-target="vocabulary-dialog" aria-labelledby="vocabulary-dialog-title">
       <header>
-        <h2 data-target="title">Add vocabulary</h2>
+        <h2 id="vocabulary-dialog-title" data-target="title">Add vocabulary</h2>
 
         <button aria-label="Close dialog" type="button" data-action="close-dialog">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -138,7 +157,7 @@
         </button>
       </header>
 
-      <form data-target="vocabulary-form" method="dialog" id="vocabulary-form">
+      <form data-target="vocabulary-form" method="dialog">
         <input type="hidden" name="id">
 
         <div class="form-group">
@@ -159,9 +178,9 @@
       </form>
     </dialog>
 
-    <dialog data-target="training-dialog">
+    <dialog data-target="training-dialog" aria-labelledby="training-dialog-title">
       <header>
-        <h2>Training</h2>
+        <h2 id="training-dialog-title">Training</h2>
 
         <button aria-label="Close dialog" type="button" data-action="close-dialog">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -175,7 +194,7 @@
         <label for="progress"></label>
       </div>
 
-      <form class="training-form" data-target="training-form" id="training-form" method="dialog">
+      <form class="training-form" data-target="training-form" method="dialog">
         <div class="form-group">
           <label for="answer" data-target="label"></label>
           <input type="text" id="answer" class="form-control" placeholder="Type your answer..." autocomplete="off" required autofocus>
@@ -206,20 +225,26 @@
       </div>
     </dialog>
 
-    <dialog id="language-dialog">
+    <dialog data-target="language-dialog" aria-labelledby="language-dialog-title">
       <header>
-        <h2>Add language</h2>
+        <h2 id="language-dialog-title">Add language</h2>
+
+        <button aria-label="Close dialog" type="button" data-action="close-dialog">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 7L7 17M7 7L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
       </header>
     
-      <form id="language-form" method="dialog">
+      <form data-target="language-form" method="dialog">
         <div class="form-group">
           <label for="language-select" class="form-label">Select a language</label>
-          <select id="language-select" class="form-control" required></select>
+          <select id="language-select" class="form-control" required data-target="language-select"></select>
         </div>
 
         <footer>
-          <button type="button" id="language-dialog-cancel" class="button -secondary">Cancel</button>
-          <button type="submit" class="button -primary">Add</button>
+          <button type="button" data-action="close-dialog" class="button -secondary">Close</button>
+          <button type="submit" class="button -primary">Add language</button>
         </footer>
       </form>
     </dialog>

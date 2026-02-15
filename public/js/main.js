@@ -1,6 +1,7 @@
 import * as vocabularyTable from "./vocabulary-table.js";
 import * as vocabularyDialog from "./vocabulary-dialog.js";
 import * as trainingDialog from "./training-dialog.js";
+import * as languageDialog from "./dialogs/language-dialog.js";
 import * as languageSwitcher from "./language-switcher.js";
 import * as userMenu from "./user-menu.js";
 
@@ -26,9 +27,15 @@ languageSwitcher.setOnLanguageChange((language) => {
   trainingDialog.updateTrainingButton();
 });
 
+// Wire up language dialog callbacks
+languageDialog.setOnLanguageCreate((language) => {
+  languageSwitcher.addLanguage(language);
+});
+
 // Initialize all modules
 languageSwitcher.init();
 userMenu.init();
+languageDialog.init();
 vocabularyTable.init();
 vocabularyDialog.init();
 trainingDialog.init();

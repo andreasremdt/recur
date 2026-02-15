@@ -3,7 +3,7 @@ import { execSync } from "node:child_process";
 import { login } from "./helpers";
 
 // Lookup table: English prompt → Spanish answer (for the 7 due items)
-const ANSWERS: Record<string, string> = {
+let ANSWERS: Record<string, string> = {
   hello: "hola",
   goodbye: "adiós",
   "thank you": "gracias",
@@ -19,172 +19,200 @@ test.beforeEach(async ({ page }) => {
   });
 
   await login(page);
-  await expect(page.locator('[data-target="word-count"]')).not.toBeEmpty();
+  await expect(page.getByText(/\d+ words/)).toBeVisible();
 });
 
 test("shows correct count of due items on the training button", async ({
   page,
 }) => {
+  let trainingButton = page.getByRole("button", {
+    name: /start training|nothing to repeat today/i,
+  });
+
   // French is auto-selected — has no vocabulary at all
-  await expect(page.locator('[data-action="start-training"]')).toHaveText(
-    "Nothing to repeat today",
-  );
-  await expect(page.locator('[data-action="start-training"]')).toBeDisabled();
+  await expect(trainingButton).toHaveText(/nothing to repeat today/i);
+  await expect(trainingButton).toBeDisabled();
 
   // Switch to Spanish — 7 items are due (overdue + due today)
-  await page.selectOption("#language-dropdown", { label: "Spanish" });
-  await expect(page.locator('[data-action="start-training"]')).toHaveText(
-    "Start Training (7)",
-  );
-  await expect(page.locator('[data-action="start-training"]')).toBeEnabled();
+  await page.getByRole("button", { name: /open your languages/i }).click();
+  await page.getByRole("button", { name: /spanish/i }).click();
+  await expect(trainingButton).toHaveText(/start training \(7\)/i);
+  await expect(trainingButton).toBeEnabled();
 });
 
 test("answers a question correctly and shows positive feedback", async ({
   page,
 }) => {
-  await page.selectOption("#language-dropdown", { label: "Spanish" });
-  await expect(page.locator('[data-action="start-training"]')).toBeEnabled();
+  await page.getByRole("button", { name: /open your languages/i }).click();
+  await page.getByRole("button", { name: /spanish/i }).click();
 
-  // Start training
-  await page.click('[data-action="start-training"]');
-  await expect(page.locator('[data-target="training-dialog"]')).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: /start training|nothing to repeat today/i,
+    }),
+  ).toBeEnabled();
+
+  let dialog = page.getByRole("dialog", { name: /training/i });
+
+  await page.getByRole("button", { name: /start training/i }).click();
+
+  await expect(dialog).toBeVisible();
 
   // Read the prompt and provide the correct answer
-  const prompt = await page.locator('[data-target="label"]').textContent();
-  const correctAnswer = ANSWERS[prompt!.trim()];
+  let prompt = await dialog.locator('[data-target="label"]').textContent();
+  let correctAnswer = ANSWERS[prompt!.trim()];
 
-  await page.fill('input[id="answer"]', correctAnswer!);
-  await page.click('[data-testid="check-button"]');
+  await dialog.getByPlaceholder(/type your answer/i).fill(correctAnswer!);
+  await dialog.getByRole("button", { name: /check/i }).click();
 
-  // Should show positive feedback
-  await expect(page.locator('[data-target="training-result"]')).toBeVisible();
-  await expect(page.locator('[data-target="icon"]')).toHaveClass(/-green/);
-  await expect(page.locator('[data-target="training-form"]')).toBeHidden();
+  await expect(dialog.locator('[data-target="training-result"]')).toBeVisible();
+  await expect(dialog.locator('[data-target="icon"]')).toHaveClass(/-green/);
+  await expect(dialog.locator('[data-target="training-form"]')).toBeHidden();
 });
 
 test("answers a question incorrectly and shows the correct answer", async ({
   page,
 }) => {
-  await page.selectOption("#language-dropdown", { label: "Spanish" });
-  await expect(page.locator('[data-action="start-training"]')).toBeEnabled();
+  await page.getByRole("button", { name: /open your languages/i }).click();
+  await page.getByRole("button", { name: /spanish/i }).click();
+  await expect(
+    page.getByRole("button", {
+      name: /start training|nothing to repeat today/i,
+    }),
+  ).toBeEnabled();
 
-  await page.click('[data-action="start-training"]');
-  await expect(page.locator('[data-target="training-dialog"]')).toBeVisible();
+  let dialog = page.getByRole("dialog", { name: /training/i });
 
-  // Read the prompt so we know what the correct answer should be
-  const prompt = await page.locator('[data-target="label"]').textContent();
-  const correctAnswer = ANSWERS[prompt!.trim()];
+  await page.getByRole("button", { name: /start training/i }).click();
 
-  // Provide a wrong answer
-  await page.fill('input[id="answer"]', "deliberately wrong");
-  await page.click('[data-testid="check-button"]');
+  await expect(dialog).toBeVisible();
 
-  // Should show negative feedback with the correct answer
-  await expect(page.locator('[data-target="training-result"]')).toBeVisible();
-  await expect(page.locator('[data-target="icon"]')).toHaveClass(/-red/);
-  await expect(page.locator('[data-target="correct-answer"]')).toHaveText(
+  let prompt = await dialog.locator('[data-target="label"]').textContent();
+  let correctAnswer = ANSWERS[prompt!.trim()];
+
+  await dialog.getByPlaceholder(/type your answer/i).fill("deliberately wrong");
+  await dialog.getByRole("button", { name: /check/i }).click();
+
+  await expect(dialog.locator('[data-target="training-result"]')).toBeVisible();
+  await expect(dialog.locator('[data-target="icon"]')).toHaveClass(/-red/);
+  await expect(dialog.locator('[data-target="correct-answer"]')).toHaveText(
     correctAnswer!,
   );
-  await expect(page.locator('[data-target="training-form"]')).toBeHidden();
+  await expect(dialog.locator('[data-target="training-form"]')).toBeHidden();
 });
 
 test("completes a full training session and shows summary", async ({
   page,
 }) => {
-  await page.selectOption("#language-dropdown", { label: "Spanish" });
-  await expect(page.locator('[data-action="start-training"]')).toHaveText(
-    "Start Training (7)",
-  );
+  await page.getByRole("button", { name: /open your languages/i }).click();
+  await page.getByRole("button", { name: /spanish/i }).click();
+  await expect(
+    page.getByRole("button", { name: /start training/i }),
+  ).toHaveText(/start training \(7\)/i);
 
-  await page.click('[data-action="start-training"]');
-  await expect(page.locator('[data-target="training-dialog"]')).toBeVisible();
+  let dialog = page.getByRole("dialog", { name: /training/i });
+  await page.getByRole("button", { name: /start training/i }).click();
+  await expect(dialog).toBeVisible();
+
+  let answerInput = dialog.getByPlaceholder(/type your answer/i);
 
   // Answer all 7 questions — first one wrong, rest correct
   for (let i = 0; i < 7; i++) {
-    const prompt = await page.locator('[data-target="label"]').textContent();
-    const correctAnswer = ANSWERS[prompt!.trim()];
+    let prompt = await dialog.locator('[data-target="label"]').textContent();
+    let correctAnswer = ANSWERS[prompt!.trim()];
 
     if (i === 0) {
-      await page.fill('input[id="answer"]', "deliberately wrong");
+      await answerInput.fill("deliberately wrong");
     } else {
-      await page.fill('input[id="answer"]', correctAnswer!);
+      await answerInput.fill(correctAnswer!);
     }
 
-    await page.click('[data-testid="check-button"]');
-    await expect(page.locator('[data-target="training-result"]')).toBeVisible();
+    await dialog.getByRole("button", { name: /check/i }).click();
+    await expect(
+      dialog.locator('[data-target="training-result"]'),
+    ).toBeVisible();
 
-    await page.click('[data-target="next"]');
+    await dialog.getByRole("button", { name: /next/i }).click();
   }
 
-  // Completion screen should appear
-  await expect(page.locator('[data-target="training-complete"]')).toBeVisible();
-  await expect(page.locator('[data-target="summary"]')).toContainText(
+  await expect(
+    dialog.locator('[data-target="training-complete"]'),
+  ).toBeVisible();
+  await expect(dialog.locator('[data-target="summary"]')).toContainText(
     "6 out of 7",
   );
 
-  // Close training
-  await page.click('[data-target="close"]');
-  await expect(
-    page.locator('[data-target="training-dialog"]'),
-  ).not.toBeVisible();
+  await dialog.getByRole("button", { name: /close/i }).last().click();
+  await expect(dialog).not.toBeVisible();
 });
 
 test("updates the training button after completing a session", async ({
   page,
 }) => {
-  await page.selectOption("#language-dropdown", { label: "Spanish" });
-  await expect(page.locator('[data-action="start-training"]')).toHaveText(
-    "Start Training (7)",
-  );
+  let trainingButton = page.getByRole("button", {
+    name: /start training|nothing to repeat today/i,
+  });
 
-  // Complete all training with correct answers
-  await page.click('[data-action="start-training"]');
-  await expect(page.locator('[data-target="training-dialog"]')).toBeVisible();
+  await page.getByRole("button", { name: /open your languages/i }).click();
+  await page.getByRole("button", { name: /spanish/i }).click();
+
+  await expect(trainingButton).toHaveText(/start training \(7\)/i);
+
+  let dialog = page.getByRole("dialog", { name: /training/i });
+
+  await page.getByRole("button", { name: /start training/i }).click();
+
+  await expect(dialog).toBeVisible();
+
+  let input = dialog.getByPlaceholder(/type your answer/i);
 
   for (let i = 0; i < 7; i++) {
-    const prompt = await page.locator('[data-target="label"]').textContent();
-    const correctAnswer = ANSWERS[prompt!.trim()];
+    let prompt = await dialog.locator('[data-target="label"]').textContent();
+    let correctAnswer = ANSWERS[prompt!.trim()];
 
-    await page.fill('input[id="answer"]', correctAnswer!);
-    await page.click('[data-testid="check-button"]');
-    await expect(page.locator('[data-target="training-result"]')).toBeVisible();
-    await page.click('[data-target="next"]');
+    await input.fill(correctAnswer!);
+    await dialog.getByRole("button", { name: /check/i }).click();
+
+    await expect(
+      dialog.locator('[data-target="training-result"]'),
+    ).toBeVisible();
+    await dialog.getByRole("button", { name: /next/i }).click();
   }
 
-  await page.click('[data-target="close"]');
+  await dialog.getByRole("button", { name: /close/i }).last().click();
 
-  // After completing all training, button should show "Nothing to repeat today"
-  await expect(page.locator('[data-action="start-training"]')).toHaveText(
-    "Nothing to repeat today",
-  );
-  await expect(page.locator('[data-action="start-training"]')).toBeDisabled();
+  await expect(trainingButton).toHaveText(/nothing to repeat today/i);
+  await expect(trainingButton).toBeDisabled();
 });
 
 test("shows progress during training", async ({ page }) => {
-  await page.selectOption("#language-dropdown", { label: "Spanish" });
-  await page.click('[data-action="start-training"]');
-  await expect(page.locator('[data-target="training-dialog"]')).toBeVisible();
+  await page.getByRole("button", { name: /open your languages/i }).click();
+  await page.getByRole("button", { name: /spanish/i }).click();
+  await page.getByRole("button", { name: /start training/i }).click();
 
-  // Progress should start at 0%
-  const progressBar = page.locator("progress");
-  await expect(progressBar).toHaveAttribute("max", "7");
-  await expect(progressBar).toHaveAttribute("value", "0");
+  let dialog = page.getByRole("dialog", { name: /training/i });
 
-  // Answer first question
-  const prompt = await page.locator('[data-target="label"]').textContent();
-  await page.fill('input[id="answer"]', ANSWERS[prompt!.trim()]!);
-  await page.click('[data-testid="check-button"]');
+  await expect(dialog).toBeVisible();
 
-  // Progress should update after answering
-  await expect(progressBar).toHaveAttribute("value", "1");
+  let progressbar = dialog.getByRole("progressbar");
 
-  // Move to next question
-  await page.click('[data-target="next"]');
+  await expect(progressbar).toHaveAttribute("max", "7");
+  await expect(progressbar).toHaveAttribute("value", "0");
 
-  // Answer second question
-  const prompt2 = await page.locator('[data-target="label"]').textContent();
-  await page.fill('input[id="answer"]', ANSWERS[prompt2!.trim()]!);
-  await page.click('[data-testid="check-button"]');
+  let input = dialog.getByPlaceholder(/type your answer/i);
+  let prompt = await dialog.locator('[data-target="label"]').textContent();
 
-  await expect(progressBar).toHaveAttribute("value", "2");
+  await input.fill(ANSWERS[prompt!.trim()]!);
+  await dialog.getByRole("button", { name: /check/i }).click();
+
+  await expect(progressbar).toHaveAttribute("value", "1");
+
+  await dialog.getByRole("button", { name: /next/i }).click();
+
+  prompt = await dialog.locator('[data-target="label"]').textContent();
+
+  await input.fill(ANSWERS[prompt!.trim()]!);
+  await dialog.getByRole("button", { name: /check/i }).click();
+
+  await expect(progressbar).toHaveAttribute("value", "2");
 });

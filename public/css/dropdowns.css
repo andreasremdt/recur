@@ -1,15 +1,14 @@
 @layer components {
   .dropdown {
     position: absolute;
-    position-anchor: --user-menu;
-    inset-block-start: anchor(bottom);
-    inset-inline-start: anchor(right);
-    translate: -100% 3px;
     border: 1px solid var(--color-neutral-200);
     border-radius: 8px;
     box-shadow: 0 3px 5px -1px rgba(0,0,0,.075);
     padding-block: 0.5rem;
     min-inline-size: 12rem;
+    inset-block-start: anchor(bottom);
+    inset-inline-start: anchor(right);
+    translate: -100% 3px;
 
     & .item {
       font-weight: 500;
@@ -23,11 +22,16 @@
       align-items: center;
 
       & svg {
-        opacity: 0.4;
+        color: var(--color-neutral-400);
       }
 
       &:hover {
         background-color: var(--color-neutral-100);
+      }
+
+      &.-active {
+        color: var(--color-brand-600);
+        font-weight: 600;
       }
     }
 
@@ -37,5 +41,13 @@
        margin-block: 0.5rem;
        background-color: var(--color-neutral-200);
     }
+  }
+
+  #user-menu {
+    position-anchor: --user-menu;
+  }
+
+  #language-menu {
+    position-anchor: --language-switcher;
   }
 }

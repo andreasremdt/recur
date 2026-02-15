@@ -1,37 +1,16 @@
 import fetcher from "./fetcher.js";
 import { loadLanguage, saveLanguage } from "./storage.js";
-
-// Available languages for the dropdown
-const AVAILABLE_LANGUAGES = [
-  "Arabic",
-  "Chinese",
-  "Dutch",
-  "English",
-  "French",
-  "German",
-  "Greek",
-  "Hebrew",
-  "Hindi",
-  "Italian",
-  "Japanese",
-  "Korean",
-  "Polish",
-  "Portuguese",
-  "Russian",
-  "Spanish",
-  "Swedish",
-  "Turkish",
-  "Vietnamese",
-];
+import { setVisibility } from "./utils.js";
+import LANGUAGE_MAP from "./language-map.js";
 
 // Elements
-const languageSwitcher = document.querySelector("#language-switcher");
-const languageDropdown = document.querySelector("#language-dropdown");
-const addLanguageOption = document.querySelector("#add-language-option");
-const languageDialog = document.querySelector("#language-dialog");
-const languageForm = document.querySelector("#language-form");
-const languageSelect = document.querySelector("#language-select");
-const languageDialogCancel = document.querySelector("#language-dialog-cancel");
+let addLanguageButton = document.querySelector('[data-action="add-language"]');
+let languageFlag = document.querySelector('[data-target="language-flag"]');
+let dropdownTrigger = document.querySelector(
+  '[data-target="language-dropdown-trigger"]',
+);
+let languageMenu = document.querySelector('[data-target="language-menu"]');
+let languageList = document.querySelector('[data-target="language-list"]');
 
 // State
 let languages = [];
@@ -44,53 +23,65 @@ export function setOnLanguageChange(callback) {
   onLanguageChange = callback;
 }
 
+export function addLanguage(newLanguage) {
+  languages.push(newLanguage);
+  languages.sort((a, b) => a.name.localeCompare(b.name));
+
+  currentLanguage = newLanguage;
+
+  saveLanguage(currentLanguage);
+  renderLanguageDropdown();
+}
+
 export function getCurrentLanguage() {
   return currentLanguage;
 }
 
 function renderLanguageDropdown() {
-  // Clear existing options except the "Add language" option
-  const options = languageDropdown.querySelectorAll("option:not(#add-language-option)");
-  options.forEach((opt) => opt.remove());
-
-  // Add placeholder when no languages exist
   if (languages.length === 0) {
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "No language";
-    placeholder.disabled = true;
-    placeholder.selected = true;
-    languageDropdown.insertBefore(placeholder, addLanguageOption);
-    languageSwitcher.classList.add("no-languages");
+    setVisibility(addLanguageButton, true);
+    setVisibility(dropdownTrigger, false);
   } else {
-    languageSwitcher.classList.remove("no-languages");
-    
-    // Add language options before the "Add language" option
-    for (const lang of languages) {
-      const option = document.createElement("option");
-      option.value = lang.id;
-      option.textContent = lang.name;
-      if (currentLanguage && lang.id === currentLanguage.id) {
-        option.selected = true;
-      }
-      languageDropdown.insertBefore(option, addLanguageOption);
+    setVisibility(addLanguageButton, false);
+    setVisibility(dropdownTrigger, true);
+
+    if (currentLanguage) {
+      languageFlag.setAttribute(
+        "href",
+        `/icons/country-defs.svg#${currentLanguage.name}`,
+      );
     }
+
+    let options = languages.map((language) => {
+      return `
+        <button type="button" class="item${language.id === currentLanguage.id ? " -active" : ""}" data-language-id="${language.id}" data-action="switch-langage">
+          <svg width="20" height="20">
+            <use href="/icons/country-defs.svg#${language.name}" />
+          </svg>
+
+          ${LANGUAGE_MAP[language.name] ?? language.name}
+        </button>`;
+    });
+
+    languageList.innerHTML = options.join("");
   }
 }
 
-function renderLanguageSelectOptions() {
-  languageSelect.innerHTML = "";
+function handleSelectLanguage(event) {
+  let { languageId } = event.target.dataset;
+  let match = languages.find((language) => language.id === languageId);
 
-  // Get names of existing languages for filtering
-  const existingNames = new Set(languages.map((l) => l.name.toLowerCase()));
+  if (!match || match.id === currentLanguage.id) {
+    return;
+  }
 
-  for (const langName of AVAILABLE_LANGUAGES) {
-    if (!existingNames.has(langName.toLowerCase())) {
-      const option = document.createElement("option");
-      option.value = langName;
-      option.textContent = langName;
-      languageSelect.appendChild(option);
-    }
+  currentLanguage = match;
+  saveLanguage(currentLanguage);
+  renderLanguageDropdown();
+  languageMenu.hidePopover();
+
+  if (onLanguageChange) {
+    onLanguageChange(currentLanguage);
   }
 }
 
@@ -99,7 +90,10 @@ export async function loadLanguages() {
     languages = await fetcher.get("/api/languages");
 
     // If no current language is set, or if the stored language doesn't exist anymore
-    if (!currentLanguage || !languages.find((l) => l.id === currentLanguage.id)) {
+    if (
+      !currentLanguage ||
+      !languages.find((l) => l.id === currentLanguage.id)
+    ) {
       if (languages.length > 0) {
         currentLanguage = languages[0];
         saveLanguage(currentLanguage);
@@ -119,64 +113,7 @@ export async function loadLanguages() {
   }
 }
 
-function handleLanguageSwitch(event) {
-  const value = event.target.value;
-
-  if (value === "add-new") {
-    // Reset dropdown to current language while dialog is open
-    if (currentLanguage) {
-      languageDropdown.value = currentLanguage.id;
-    }
-    renderLanguageSelectOptions();
-    languageDialog.showModal();
-    return;
-  }
-
-  const selectedLanguage = languages.find((l) => l.id === value);
-  if (selectedLanguage && (!currentLanguage || selectedLanguage.id !== currentLanguage.id)) {
-    currentLanguage = selectedLanguage;
-    saveLanguage(currentLanguage);
-    if (onLanguageChange) {
-      onLanguageChange(currentLanguage);
-    }
-  }
-}
-
-async function handleCreateLanguage(event) {
-  event.preventDefault();
-
-  const name = languageSelect.value;
-  if (!name) return;
-
-  try {
-    const newLanguage = await fetcher.post("/api/languages", { name });
-    languages.push(newLanguage);
-    languages.sort((a, b) => a.name.localeCompare(b.name));
-
-    currentLanguage = newLanguage;
-    saveLanguage(currentLanguage);
-
-    renderLanguageDropdown();
-    languageDialog.close();
-
-    if (onLanguageChange) {
-      onLanguageChange(currentLanguage);
-    }
-  } catch (error) {
-    console.error("Failed to create language:", error);
-  }
-}
-
 export function init() {
-  languageDropdown.addEventListener("change", handleLanguageSwitch);
-  languageForm.addEventListener("submit", handleCreateLanguage);
-  languageDialogCancel.addEventListener("click", () => languageDialog.close());
-
-  languageDialog.addEventListener("click", (event) => {
-    if (event.target === languageDialog) {
-      languageDialog.close();
-    }
-  });
-
+  languageList.addEventListener("click", handleSelectLanguage);
   loadLanguages();
 }

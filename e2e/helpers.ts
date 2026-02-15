@@ -6,11 +6,19 @@ export async function login(
   password = "password123",
 ) {
   await page.goto("/login.html");
-  await page.fill('input[name="email"]', email);
-  await page.fill('input[name="password"]', password);
-  await page.click('button[type="submit"]');
+
+  // Fill in the form
+  await page.getByLabel(/email/i).fill(email);
+  await page.getByLabel(/password/i).fill(password);
+  await page.getByRole("button", { name: /sign in/i }).click();
+
   await page.waitForURL("/");
-  await page.click('[data-testid="user-menu"]');
-  await expect(page.locator('[data-target="user-name"]')).toBeVisible();
-  await page.click('[data-testid="user-menu"]');
+
+  // Open the user menu
+  await page.getByRole("button", { name: /open user menu/i }).click();
+
+  await expect(page.getByText(/john doe/i)).toBeVisible();
+
+  // Close the user menu so that it doesn't interfere with other tests by overlapping with other elements
+  await page.getByRole("button", { name: /open user menu/i }).click();
 }

@@ -13,49 +13,47 @@ test.describe("Registration", () => {
   }) => {
     await page.goto("/register.html");
 
-    await page.fill("#name", "New User");
-    await page.fill("#email", "newuser@example.com");
-    await page.fill("#password", "testpassword");
-    await page.fill("#confirmPassword", "testpassword");
-    await page.click('button[type="submit"]');
+    // Fill in the form
+    await page.getByLabel(/name/i).fill("New User");
+    await page.getByLabel(/email/i).fill("newuser@example.com");
+    await page.getByLabel(/^password/i).fill("testpassword");
+    await page.getByLabel(/confirm password/i).fill("testpassword");
+    await page.getByRole("button", { name: /create account/i }).click();
 
     await expect(page).toHaveURL("/");
-    await page.click('[data-testid="user-menu"]');
-    await expect(page.locator('[data-target="user-name"]')).toHaveText(
-      "New User",
-    );
+
+    // Open the user menu
+    await page.getByRole("button", { name: /open user menu/i }).click();
+
+    await expect(page.getByText(/new user/i)).toBeVisible();
   });
 
   test("shows error when passwords do not match", async ({ page }) => {
     await page.goto("/register.html");
 
-    await page.fill("#name", "New User");
-    await page.fill("#email", "newuser@example.com");
-    await page.fill("#password", "testpassword");
-    await page.fill("#confirmPassword", "differentpassword");
-    await page.click('button[type="submit"]');
+    // Fill in the form
+    await page.getByLabel(/name/i).fill("New User");
+    await page.getByLabel(/email/i).fill("newuser@example.com");
+    await page.getByLabel(/^password/i).fill("testpassword");
+    await page.getByLabel(/confirm password/i).fill("differentpassword");
+    await page.getByRole("button", { name: /create account/i }).click();
 
-    await expect(page.locator("#error-message")).toBeVisible();
-    await expect(page.locator("#error-message")).toHaveText(
-      "Passwords do not match",
-    );
-    await expect(page).toHaveURL(/register\.html/);
+    await expect(page.getByText(/passwords do not match/i)).toBeVisible();
+    await expect(page).toHaveURL("register.html");
   });
 
   test("shows error when email is already taken", async ({ page }) => {
     await page.goto("/register.html");
 
-    await page.fill("#name", "Another John");
-    await page.fill("#email", "john@example.com");
-    await page.fill("#password", "testpassword");
-    await page.fill("#confirmPassword", "testpassword");
-    await page.click('button[type="submit"]');
+    // Fill in the form
+    await page.getByLabel(/name/i).fill("Another John");
+    await page.getByLabel(/email/i).fill("john@example.com");
+    await page.getByLabel(/^password/i).fill("testpassword");
+    await page.getByLabel(/confirm password/i).fill("testpassword");
+    await page.getByRole("button", { name: /create account/i }).click();
 
-    await expect(page.locator("#error-message")).toBeVisible();
-    await expect(page.locator("#error-message")).toContainText(
-      "Email already exists",
-    );
-    await expect(page).toHaveURL(/register\.html/);
+    await expect(page.getByText(/email already exists/i)).toBeVisible();
+    await expect(page).toHaveURL("register.html");
   });
 });
 
@@ -65,57 +63,59 @@ test.describe("Login", () => {
   }) => {
     await page.goto("/login.html");
 
-    await page.fill('input[name="email"]', "john@example.com");
-    await page.fill('input[name="password"]', "password123");
-    await page.click('button[type="submit"]');
+    // Fill in the form
+    await page.getByLabel(/email/i).fill("john@example.com");
+    await page.getByLabel(/password/i).fill("password123");
+    await page.getByRole("button", { name: /sign in/i }).click();
 
     await expect(page).toHaveURL("/");
-    await page.click('[data-testid="user-menu"]');
-    await expect(page.locator('[data-target="user-name"]')).toHaveText(
-      "John Doe",
-    );
+
+    // Open the user menu
+    await page.getByRole("button", { name: /open user menu/i }).click();
+
+    await expect(page.getByText(/john doe/i)).toBeVisible();
   });
 
   test("shows error with invalid credentials", async ({ page }) => {
     await page.goto("/login.html");
 
-    await page.fill('input[name="email"]', "john@example.com");
-    await page.fill('input[name="password"]', "wrongpassword");
-    await page.click('button[type="submit"]');
+    // Fill in the form
+    await page.getByLabel(/email/i).fill("john@example.com");
+    await page.getByLabel(/password/i).fill("wrongpassword");
+    await page.getByRole("button", { name: /sign in/i }).click();
 
-    await expect(page.locator("#error-message")).toBeVisible();
-    await expect(page.locator("#error-message")).toContainText(
-      "Invalid email or password",
-    );
-    await expect(page).toHaveURL(/login\.html/);
+    await expect(page.getByText(/invalid email or password/i)).toBeVisible();
+    await expect(page).toHaveURL("login.html");
   });
 
   test("shows error with non-existent email", async ({ page }) => {
     await page.goto("/login.html");
 
-    await page.fill('input[name="email"]', "nobody@example.com");
-    await page.fill('input[name="password"]', "testpassword");
-    await page.click('button[type="submit"]');
+    // Fill in the form
+    await page.getByLabel(/email/i).fill("nobody@example.com");
+    await page.getByLabel(/password/i).fill("testpassword");
+    await page.getByRole("button", { name: /sign in/i }).click();
 
-    await expect(page.locator("#error-message")).toBeVisible();
-    await expect(page.locator("#error-message")).toContainText(
-      "Invalid email or password",
-    );
+    await expect(page.getByText(/invalid email or password/i)).toBeVisible();
+    await expect(page).toHaveURL("login.html");
   });
 });
 
 test.describe("Logout", () => {
   test("logs out and redirects to the login page", async ({ page }) => {
     await page.goto("/login.html");
-    await page.fill('input[name="email"]', "john@example.com");
-    await page.fill('input[name="password"]', "password123");
-    await page.click('button[type="submit"]');
+    // Fill in the form
+    await page.getByLabel(/email/i).fill("john@example.com");
+    await page.getByLabel(/password/i).fill("password123");
+    await page.getByRole("button", { name: /sign in/i }).click();
+
     await expect(page).toHaveURL("/");
 
-    await page.click('[data-testid="user-menu"]');
-    await page.click('[data-action="logout"]');
+    // Open the user menu
+    await page.getByRole("button", { name: /open user menu/i }).click();
+    await page.getByRole("button", { name: /log out/i }).click();
 
-    await expect(page).toHaveURL(/login\.html/);
+    await expect(page).toHaveURL("login.html");
   });
 });
 

@@ -8,8 +8,13 @@
   .app-header {
     display: flex;
     align-items: center;
+    gap: 1rem;
     justify-content: space-between;
     padding-block: 1.5rem;
+
+    & .logo {
+      margin-inline-end: auto;
+    }
 
     & .avatar {
       --size: 36px;
@@ -18,11 +23,7 @@
       aspect-ratio: 1;
       background-color: var(--color-neutral-100);
       color: var(--color-neutral-600);
-      appearance: none;
-      padding: unset;
-      border: unset;
-      margin: unset;
-      cursor: pointer;
+      border: 1px solid var(--color-neutral-200);
       display: grid;
       place-items: center;
       border-radius: var(--size);
@@ -31,8 +32,30 @@
 
       &:hover {
         background-color: var(--color-neutral-200);
+        border-color: var(--color-neutral-300);
       }
 
+      &:focus-visible {
+        outline: 2px solid var(--color-brand-500);
+        outline-offset: 2px;
+      }
+    }
+
+    .language-trigger {
+      --size: 36px;
+
+      opacity: 0.8;
+      display: flex;
+      inline-size: var(--size);
+      aspect-ratio: 1;
+      border-radius: var(--size);
+      transition: opacity 0.15s ease-in-out;
+      anchor-name: --language-switcher;
+
+      &:hover {
+        opacity: 1;
+      }
+  
       &:focus-visible {
         outline: 2px solid var(--color-brand-500);
         outline-offset: 2px;
@@ -53,21 +76,5 @@
   .user-email {
     margin: unset;
     color: var(--color-neutral-600);
-  }
-
-  .language-switcher {
-    display: flex;
-    align-items: center;
-  }
-
-  .language-switcher.no-languages .language-dropdown {
-    color: var(--color-neutral-500);
-  }
-
-  button[title="Add vocabulary"] {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 2;
   }
 }

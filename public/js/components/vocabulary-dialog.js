@@ -1,4 +1,4 @@
-import { setVisibility } from "./utils.js";
+import { setVisibility } from "../lib/utils.js";
 
 let dialog = document.querySelector("[data-target='vocabulary-dialog']");
 let title = dialog.querySelector("[data-target='title']");

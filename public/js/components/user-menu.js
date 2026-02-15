@@ -1,4 +1,4 @@
-import fetcher from "./fetcher.js";
+import fetcher from "../lib/fetcher.js";
 
 let logout = document.querySelector('[data-action="logout"]');
 let name = document.querySelector('[data-target="user-name"]');

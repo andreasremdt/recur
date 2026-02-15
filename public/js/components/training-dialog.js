@@ -1,5 +1,5 @@
-import fetcher from "./fetcher.js";
-import { normalize, setVisibility } from "./utils.js";
+import fetcher from "../lib/fetcher.js";
+import { normalize, setVisibility } from "../lib/utils.js";
 
 let startTraining = document.querySelector('[data-target="start-training"]');
 let dialog = document.querySelector('[data-target="training-dialog"]');

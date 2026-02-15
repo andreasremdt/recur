@@ -1,5 +1,5 @@
 import LANGUAGE_MAP from "../language-map.js";
-import fetcher from "../fetcher.js";
+import fetcher from "../lib/fetcher.js";
 
 let dialog = document.querySelector('[data-target="language-dialog"]');
 let form = dialog.querySelector('[data-target="language-form"]');

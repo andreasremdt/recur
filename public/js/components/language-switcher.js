@@ -1,7 +1,7 @@
-import fetcher from "./fetcher.js";
-import { loadLanguage, saveLanguage } from "./storage.js";
-import { setVisibility } from "./utils.js";
-import LANGUAGE_MAP from "./language-map.js";
+import fetcher from "../lib/fetcher.js";
+import { loadLanguage, saveLanguage } from "../lib/storage.js";
+import { setVisibility } from "../lib/utils.js";
+import LANGUAGE_MAP from "../language-map.js";
 
 // Elements
 let addLanguageButton = document.querySelector('[data-action="add-language"]');

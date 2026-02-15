@@ -1,9 +1,9 @@
-import * as vocabularyTable from "./vocabulary-table.js";
-import * as vocabularyDialog from "./vocabulary-dialog.js";
-import * as trainingDialog from "./training-dialog.js";
-import * as languageDialog from "./dialogs/language-dialog.js";
-import * as languageSwitcher from "./language-switcher.js";
-import * as userMenu from "./user-menu.js";
+import * as vocabularyTable from "./components/vocabulary-table.js";
+import * as vocabularyDialog from "./components/vocabulary-dialog.js";
+import * as trainingDialog from "./components/training-dialog.js";
+import * as languageDialog from "./components/language-dialog.js";
+import * as languageSwitcher from "./components/language-switcher.js";
+import * as userMenu from "./components/user-menu.js";
 
 // Wire up vocabulary dialog callbacks
 vocabularyDialog.setOnCreate(vocabularyTable.handleCreate);

@@ -1,11 +1,11 @@
-import fetcher from "./fetcher.js";
-import { formatRelativeDate } from "./utils.js";
+import fetcher from "../lib/fetcher.js";
+import { formatRelativeDate } from "../lib/utils.js";
 import {
   loadSort,
   saveSort,
   loadPagination,
   savePagination,
-} from "./storage.js";
+} from "../lib/storage.js";
 
 // Elements
 const table = document.querySelector("#vocabulary-table");

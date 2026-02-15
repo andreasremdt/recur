@@ -8,7 +8,7 @@
   .app-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
     justify-content: space-between;
     padding-block: 1.5rem;
 
@@ -16,22 +16,22 @@
       margin-inline-end: auto;
     }
 
-    & .avatar {
+    & :is(.avatar, .language-trigger) {
       --size: 36px;
 
       inline-size: var(--size);
       aspect-ratio: 1;
-      background-color: var(--color-neutral-100);
+      background-color: var(--color-white);
       color: var(--color-neutral-600);
       border: 1px solid var(--color-neutral-200);
       display: grid;
       place-items: center;
       border-radius: var(--size);
-      transition: background-color .15s ease-in-out;
-      anchor-name: --user-menu;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: background-color .15s ease-in-out, border-color .15s ease-in-out;
 
       &:hover {
-        background-color: var(--color-neutral-200);
+        background-color: var(--color-neutral-100);
         border-color: var(--color-neutral-300);
       }
 
@@ -41,24 +41,17 @@
       }
     }
 
-    .language-trigger {
-      --size: 36px;
+    & .avatar {      
+      anchor-name: --user-menu;
+    }
 
-      opacity: 0.8;
-      display: flex;
-      inline-size: var(--size);
-      aspect-ratio: 1;
-      border-radius: var(--size);
-      transition: opacity 0.15s ease-in-out;
+    .language-trigger {
+      padding: 0.25rem;
       anchor-name: --language-switcher;
 
-      &:hover {
-        opacity: 1;
-      }
-  
-      &:focus-visible {
-        outline: 2px solid var(--color-brand-500);
-        outline-offset: 2px;
+      & svg {
+        inline-size: 100%;
+        block-size: 100%;
       }
     }
   }
